@@ -1,10 +1,34 @@
 {
   "version": 2,
   "functions": {
-    "api/index.js": {
+    "api/order.js": {
+      "maxDuration": 30
+    },
+    "api/user.js": {
+      "maxDuration": 30
+    },
+    "api/product.js": {
       "maxDuration": 30
     }
   },
+  "routes": [
+    {
+      "src": "/api/order/(.*)",
+      "dest": "/api/order.js"
+    },
+    {
+      "src": "/api/user/(.*)",
+      "dest": "/api/user.js"
+    },
+    {
+      "src": "/api/product/(.*)",
+      "dest": "/api/product.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/order.js"
+    }
+  ],
   "env": {
     "NODE_ENV": "production"
   }
