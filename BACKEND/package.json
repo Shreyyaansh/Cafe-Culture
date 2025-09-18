@@ -4,12 +4,17 @@
   "description": "Cafe Culture Backend API",
   "main": "server.js",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "server": "nodemon server.js",
     "build": "echo 'No build step required for Node.js'",
-    "postinstall": "echo 'Dependencies installed successfully'"
+    "postinstall": "echo 'Dependencies installed successfully'",
+    "prestart": "echo 'Starting Cafe Culture Backend...'"
   },
   "keywords": [],
   "author": "",
