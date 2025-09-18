@@ -23,9 +23,11 @@ RAZORPAY_KEY_SECRET = qQO3ma0BOhmJboDKrA4t58lk
 ```
 
 ### **3. Vercel Configuration:**
+- **Node.js Version**: 22.x (automatically detected from package.json)
 - **Build Command**: `npm run vercel-build` (or auto-detected)
 - **Output Directory**: Not needed for API
 - **Install Command**: `npm install` (automatic)
+- **Function Duration**: 30 seconds (configured in vercel.json)
 
 ### **4. API Structure:**
 Your backend is now structured as:
