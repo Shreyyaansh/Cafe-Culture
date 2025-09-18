@@ -1,20 +1,20 @@
-# Railway + Vercel Deployment Setup
+# Vercel Full-Stack Deployment Setup
 
 ## 🚀 **Current Configuration:**
 
 - **Frontend**: Deployed on Vercel
-- **Backend**: Deployed on Railway at `cafe-culture-backend-production.up.railway.app`
+- **Backend**: Deployed on Vercel as API functions
 
 ## 🔧 **Environment Variables:**
 
 ### **Vercel (Frontend) Environment Variables:**
 ```
-VITE_BACKEND_URL = https://cafe-culture-backend-production.up.railway.app
+VITE_BACKEND_URL = https://your-backend-app.vercel.app
 VITE_CURRENCY = ₹
 VITE_RAZORPAY_KEY_ID = rzp_test_l1lX8ei49vhzv7
 ```
 
-### **Railway (Backend) Environment Variables:**
+### **Vercel (Backend) Environment Variables:**
 ```
 MONGODB_URI = mongodb+srv://shrey08:shrey08@cluster0.5vkidji.mongodb.net/Cafe-Culture
 JWT_SECRET = cafe-culture-jwt-secret-key-2024
@@ -31,15 +31,16 @@ RAZORPAY_KEY_SECRET = qQO3ma0BOhmJboDKrA4t58lk
 
 ## 📁 **Deployment Structure:**
 
-### **Vercel (Frontend Only):**
-- Upload only the `FRONTEND/` folder to Vercel
-- Use the updated `vercel.json` configuration
+### **Vercel (Frontend):**
+- Upload the `FRONTEND/` folder to Vercel
+- Use the `vercel.json` configuration
 - Set frontend environment variables in Vercel dashboard
 
-### **Railway (Backend Only):**
-- Upload only the `BACKEND/` folder to Railway
-- Set backend environment variables in Railway dashboard
-- Railway will automatically detect and run your Node.js app
+### **Vercel (Backend):**
+- Upload the `BACKEND/` folder to Vercel as a separate project
+- Vercel will automatically detect it as a Node.js API
+- Set backend environment variables in Vercel dashboard
+- API functions will be available at `/api/*` routes
 
 ## ✅ **API Configuration Status:**
 
@@ -52,26 +53,28 @@ Your code is already properly configured:
 ## 🔄 **API Call Flow:**
 
 1. **Frontend** makes API call: `axios.get('/api/order')`
-2. **Axios** prepends base URL: `https://cafe-culture-backend-production.up.railway.app/api/order`
-3. **Railway** handles the request and returns response
+2. **Axios** prepends base URL: `https://your-backend-app.vercel.app/api/order`
+3. **Vercel API function** handles the request and returns response
 4. **Frontend** receives the data
 
 ## 🧪 **Testing:**
 
 ### **Test API Endpoints:**
-- `https://cafe-culture-backend-production.up.railway.app/api/order`
-- `https://cafe-culture-backend-production.up.railway.app/api/user/is-auth`
-- `https://cafe-culture-backend-production.up.railway.app/api/product/list`
+- `https://your-backend-app.vercel.app/` (health check)
+- `https://your-backend-app.vercel.app/api/order`
+- `https://your-backend-app.vercel.app/api/user/is-auth`
+- `https://your-backend-app.vercel.app/api/product/list`
 
 ### **Test Frontend:**
-- Your Vercel frontend URL should connect to Railway backend
+- Your Vercel frontend URL should connect to Vercel backend
 - Admin panel should work with `Ctrl + Shift + A`
 - Cart and ordering should function properly
 
 ## 🎯 **Benefits of This Setup:**
 
-- ✅ **Scalable**: Each service can scale independently
-- ✅ **Reliable**: Railway handles backend, Vercel handles frontend
-- ✅ **Fast**: CDN for frontend, optimized backend hosting
-- ✅ **Cost-effective**: Both platforms have generous free tiers
-- ✅ **Easy deployment**: Separate deployments for each service
+- ✅ **Unified Platform**: Both frontend and backend on Vercel
+- ✅ **Serverless**: Auto-scaling API functions
+- ✅ **Fast**: Global CDN for both frontend and API
+- ✅ **Cost-effective**: Vercel has generous free tier
+- ✅ **Easy deployment**: Simple deployment process
+- ✅ **Integrated**: Seamless communication between services
