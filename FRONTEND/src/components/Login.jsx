@@ -1,7 +1,7 @@
 import React from 'react'
 import { UseAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import logo from '../assets/logo.jpg';
+// import logo from '../assets/logo.jpg'; // Removed - file no longer exists
 
 const Login = () => {
 
@@ -64,7 +64,9 @@ const Login = () => {
                 onSubmit={onSubmitHandler}
             >
                 <div className="flex flex-col items-center mb-6">
-                    <img src={logo} alt="Salasar Grocery Store Logo" className="h-14 w-14 object-contain mb-2" />
+                    <div className="h-14 w-14 bg-[#7c3f00] rounded-full flex items-center justify-center mb-2">
+                        <span className="text-white text-2xl font-bold">CC</span>
+                    </div>
                     <span className="font-bold text-2xl text-indigo-700">SALASAR</span>
                 </div>
 

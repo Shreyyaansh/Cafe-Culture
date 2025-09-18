@@ -1,24 +1,26 @@
 import React from 'react'
 import MainBanner from '../components/MainBanner'
 import Categories from '../components/Categories'
-import BestSeller from '../components/BestSeller'
+import OurStory from '../components/OurStory'
+import WhatsNew from '../components/WhatsNew'
 import ContactInfo from '../components/ContactInfo'
-import Newsletter from '../components/Newsletter'
 
 const Home = () => {
   return (
-    <div className='mt-10'> 
+    <div className='mt-0'> 
       <MainBanner/>
+      <div id="our-story-section">
+        <OurStory/>
+      </div>
       <div id="categories-section">
         <Categories/>
       </div>
-      <div id="bestseller-section">
-        <BestSeller/>
+      <div id="whats-new-section">
+        <WhatsNew/>
       </div>
       <div id="contact-section">
         <ContactInfo/>
       </div>
-      <Newsletter/>
     </div>
   )
 }

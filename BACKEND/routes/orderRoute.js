@@ -1,17 +1,35 @@
-import express from 'express';
-import authUser from '../middlewares/authUser.js';
-import authSeller from '../middlewares/authSeller.js';
-import { placeOrderCOD, getUserOrders, getAllOrders, createRazorpayOrder, verifyRazorpayPayment, getSellerStats, updateOrderPaymentStatus } from '../controllers/orderController.js';
+import express from "express";
+import {
+    createOrder,
+    getAllOrders,
+    getOrderById,
+    updateOrderStatus,
+    deleteOrder,
+    getOrdersByTable,
+    getOrderStats
+} from "../controllers/orderController.js";
 
+const router = express.Router();
 
-const orderRouter = express.Router();
+// Create a new order
+router.post("/create", createOrder);
 
-orderRouter.post('/cod', authUser, placeOrderCOD);
-orderRouter.post('/razorpay/create', authUser, createRazorpayOrder);
-orderRouter.post('/razorpay/verify', authUser, verifyRazorpayPayment);
-orderRouter.get('/user', authUser, getUserOrders);
-orderRouter.get('/seller', authSeller, getAllOrders);
-orderRouter.get('/seller/stats', authSeller, getSellerStats);
-orderRouter.patch('/seller/:id/payment-status', authSeller, updateOrderPaymentStatus);
+// Get all orders (with optional filters)
+router.get("/", getAllOrders);
 
-export default orderRouter;
+// Get order statistics
+router.get("/stats", getOrderStats);
+
+// Get orders by table number
+router.get("/table/:tableNumber", getOrdersByTable);
+
+// Get order by ID
+router.get("/:id", getOrderById);
+
+// Update order status
+router.put("/:id/status", updateOrderStatus);
+
+// Delete order
+router.delete("/:id", deleteOrder);
+
+export default router;

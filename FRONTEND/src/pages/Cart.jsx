@@ -1,211 +1,266 @@
 import React, { useEffect, useState } from 'react';
 import { UseAppContext } from '../context/AppContext';
-import { assets, dummyAddress } from '../assets/assets';
+import { assets } from '../assets/assets';
+import { getMenuItemById, isMenuItem } from '../assets/menuItems';
 import toast from 'react-hot-toast';
 
-// Razorpay script loader
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
-      return resolve(true);
-    }
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
 
 const Cart = () => {
     
-
     const[cartArray,setCartArray]=useState([]);
-    const[address,setAddress]=useState([]);
-    const [showAddress, setShowAddress] = useState(false);
-    const[selectedAddress,setSelectedAddress]=useState(null);
-    const[paymentOption,setPaymentOption]=useState("COD");
-    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const {products,currency,cartItems,removeFromCart,getCartCount,updateCartItem,navigate,getCartAmount,axios,user,setCartItems} = UseAppContext();
+    const [tableNumber, setTableNumber] = useState('');
+    const [customerName, setCustomerName] = useState('');
+    const [specialInstructions, setSpecialInstructions] = useState('');
+    const [orderType, setOrderType] = useState('dine-in');
+    const [showOrderModal, setShowOrderModal] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    const {products,currency,cartItems,removeFromCart,getCartCount,updateCartItem,navigate,getCartAmount,user,setCartItems,axios} = UseAppContext();
+    
     const getCart = () => {
         let temp=[];
         for (const key in cartItems) {
+            // Check if it's a menu item
+            if (isMenuItem(key)) {
+                const menuItem = getMenuItemById(key);
+                if (menuItem) {
+                    const cartItem = {
+                        _id: key,
+                        name: menuItem.name,
+                        offerPrice: typeof menuItem.price === 'string' ? parseFloat(menuItem.price.replace('₹', '')) : menuItem.price,
+                        images: [menuItem.image],
+                        category: menuItem.category,
+                        weight: 'N/A',
+                        quantity: cartItems[key],
+                        isMenuItem: true,
+                        description: menuItem.description,
+                        extra: menuItem.extra
+                    };
+                    temp.push(cartItem);
+                } else {
+                    // Fallback for menu items not in menuItemsData
+                    const cartItem = {
+                        _id: key,
+                        name: key.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                        offerPrice: 100, // Default price
+                        images: ['🍽️'],
+                        category: 'menu',
+                        weight: 'N/A',
+                        quantity: cartItems[key],
+                        isMenuItem: true,
+                        description: 'Menu item'
+                    };
+                    temp.push(cartItem);
+                }
+            } else {
+                // Handle database products
             const product = products.find(item => item._id === key);
             if (product) {
                 product.quantity = cartItems[key];
+                    product.isMenuItem = false;
                 temp.push(product);
+                }
             }
         }
         setCartArray(temp);
     }
 
-    const getUserAddress = async () => {
-        try {
-            const {data} = await axios.get('/api/address/get');
-            if(data.success){
-                setAddress(data.addresses);
-                if(data.addresses.length > 0){
-                    setSelectedAddress(data.addresses[0]);
-                }
-            }
-            else{
-                toast.error(data.message);
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
-    }
 
     useEffect(() => {
-        if(products.length > 0 && cartItems){
+        if(cartItems && Object.keys(cartItems).length > 0){
             getCart();
         }
     },[products,cartItems]);
 
-    useEffect(()=>{
-        if(user){
-            getUserAddress();
-        }
-    },[user]);
-
-    const handlePlaceOrder = () => {
-        if (!selectedAddress) {
-            toast.error("Please select an address");
+    // Submit order to database
+    const submitOrder = async () => {
+        if (!tableNumber) {
+            toast.error("Please enter a table number");
             return;
         }
 
-        if (paymentOption === "COD") {
-            setShowConfirmDialog(true);
-        } else if (paymentOption === "Online") {
-            placeOnlineOrder();
+        if (cartArray.length === 0) {
+            toast.error("Your cart is empty");
+            return;
         }
-    };
 
-    const placeOnlineOrder = async () => {
+        setIsSubmitting(true);
+
         try {
-            // 1. Load Razorpay script
-            const res = await loadRazorpayScript();
-            if (!res) {
-                toast.error("Razorpay SDK failed to load. Are you online?");
-                return;
-            }
-
-            // 2. Create order on backend
-            const { data } = await axios.post("/api/order/razorpay/create", {
-                item: cartArray.map(item => ({
-                    product: item._id,
-                    quantity: item.quantity
+            const orderData = {
+                tableNumber: parseInt(tableNumber),
+                customerName: customerName || "Guest",
+                items: cartArray.map(item => ({
+                    name: item.name,
+                    price: item.offerPrice,
+                    quantity: item.quantity,
+                    category: item.category,
+                    image: item.images[0] || "🍽️"
                 })),
-                address: selectedAddress._id,
-            });
-
-            if (!data.success) {
-                toast.error(data.message);
-                return;
-            }
-
-            // Save order details for verification
-            const orderDetails = data.orderDetails;
-
-            // 3. Open Razorpay checkout
-            const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-                amount: data.order.amount,
-                currency: data.order.currency,
-                name: "Salasar Enterprise",
-                description: "Order Payment",
-                order_id: data.order.id,
-                handler: async function (response) {
-                    // 4. Verify payment on backend and create order
-                    const verifyRes = await axios.post("/api/order/razorpay/verify", {
-                        razorpay_order_id: response.razorpay_order_id,
-                        razorpay_payment_id: response.razorpay_payment_id,
-                        razorpay_signature: response.razorpay_signature,
-                        item: orderDetails.item,
-                        address: orderDetails.address,
-                        amount: orderDetails.amount,
-                    });
-                    if (verifyRes.data.success) {
-                        toast.success("Payment successful!");
-                        setCartItems({});
-                        navigate("/my-orders");
-                    } else {
-                        toast.error("Payment verification failed");
-                    }
-                },
-                prefill: {
-                    name: user?.name,
-                    email: user?.email,
-                },
-                theme: {
-                    color: "#6366f1",
-                },
+                totalAmount: getCartAmount(),
+                orderType: orderType,
+                specialInstructions: specialInstructions
             };
 
-            const rzp = new window.Razorpay(options);
-            rzp.open();
+            console.log('📤 Sending order data:', orderData);
+            console.log('🌐 API URL:', axios.defaults.baseURL + '/api/order/create');
+
+            const { data } = await axios.post('/api/order/create', orderData);
+
+            if (data.success) {
+                toast.success("Order placed successfully!");
+                setCartItems({}); // Clear cart
+                setTableNumber('');
+                setCustomerName('');
+                setSpecialInstructions('');
+                setShowOrderModal(false);
+                navigate('/'); // Redirect to home
+            } else {
+                toast.error(data.message || "Failed to place order");
+            }
         } catch (error) {
-            toast.error(error.message);
+            console.error("❌ Error submitting order:", error);
+            console.error("❌ Error response:", error.response?.data);
+            console.error("❌ Error status:", error.response?.status);
+            console.error("❌ Error message:", error.message);
+            
+            const errorMessage = error.response?.data?.message || error.message || "Failed to place order. Please try again.";
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const confirmCODOrder = async () => {
-        try {
-            const {data} = await axios.post('/api/order/cod',{
-                item: cartArray.map(item => ({
-                    product: item._id,
-                    quantity: item.quantity
-                })),
-                address: selectedAddress._id,
-            });
-
-            if(data.success){
-                toast.success(data.message);
-                setCartItems({});
-                setShowConfirmDialog(false);
-                navigate('/my-orders');
-            }
-            else{
-                toast.error(data.message);
-            }
-        } catch (error) {
-            toast.error(error.message);
-        }
+    // Handle place order button click
+    const handlePlaceOrder = () => {
+        setShowOrderModal(true);
     };
 
-    const cancelOrder = () => {
-        setShowConfirmDialog(false);
-        navigate('/cart');
-    };
 
-    return (products.length > 0 && cartItems) ? (
+    // Simple loading state
+    if (!cartItems) {
+        return <div className="min-h-screen flex items-center justify-center mt-20 pt-8">
+            <div className="text-center">
+                <h1 className="text-3xl font-bold text-[#7c3f00] mb-4">Loading Cart...</h1>
+                <p className="text-[#7c3f00]/70">Please wait</p>
+            </div>
+        </div>;
+    }
+
+    return (cartItems && Object.keys(cartItems).length > 0) ? (
         <>
-            <div className="flex flex-col md:flex-row mt-12">
+            <div className="flex flex-col lg:flex-row mt-20 pt-8 gap-8">
                 <div className='flex-1 max-w-4xl'>
-                    <h1 className="text-3xl font-medium mb-6">
-                        Shopping Cart <span className="text-sm text-indigo-500">{getCartCount()}</span>
+                    <h1 className="text-3xl font-bold text-[#7c3f00] mb-6">
+                        Your Cart <span className="text-lg text-[#7c3f00]/70 ml-2">({getCartCount()} items)</span>
                     </h1>
 
-                    <div className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 text-base font-medium pb-3">
-                        <p className="text-left">Product Details</p>
+                    <div className="hidden md:grid grid-cols-[2fr_1fr_1fr] text-[#7c3f00] text-base font-semibold pb-3 bg-[#faf0e6] p-4 rounded-lg">
+                        <p className="text-left">Item Details</p>
                         <p className="text-center">Subtotal</p>
                         <p className="text-center">Action</p>
                     </div>
 
-                    {cartArray.map((product, index) => (
-                        <div key={index} className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3">
-                            <div className="flex items-center md:gap-6 gap-3">
-                                <div onClick={( )=> {navigate(`/products/${product.category.toLowerCase()}/${product._id}`);scrollTo(0,0)}} className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded">
-                                    <img className="max-w-full h-full object-cover" src={product.images[0]} alt={product.name} />
+                    {/* Scrollable items container */}
+                    <div className="max-h-[80vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[#7c3f00]/30 scrollbar-track-[#faf0e6] hover:scrollbar-thumb-[#7c3f00]/50">
+                           <div className="space-y-3 pb-4">
+                               {cartArray.map((product, index) => (
+                                   <div key={index}>
+                                       {/* Mobile Layout */}
+                                       <div className="md:hidden bg-white rounded-lg p-4 shadow-sm border border-[#7c3f00]/10">
+                                <div className="flex items-start gap-3 mb-3">
+                                    <div className="w-16 h-16 flex items-center justify-center border border-[#7c3f00]/20 rounded-lg bg-[#faf0e6] flex-shrink-0">
+                                        {product.isMenuItem ? (
+                                            product.images[0].startsWith('/') ? (
+                                                <img 
+                                                    className="max-w-full h-full object-cover rounded-lg" 
+                                                    src={product.images[0]} 
+                                                    alt={product.name} 
+                                                />
+                                            ) : (
+                                                <span className="text-2xl">{product.images[0]}</span>
+                                            )
+                                        ) : (
+                                            <img 
+                                                className="max-w-full h-full object-cover rounded-lg" 
+                                                src={product.images[0]} 
+                                                alt={product.name} 
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-[#7c3f00] mb-1 text-sm">{product.name}</p>
+                                        {product.description && (
+                                            <p className="text-xs text-[#7c3f00]/70 mb-1 line-clamp-2">{product.description}</p>
+                                        )}
+                                        <p className="text-xs text-[#7c3f00]/60 mb-2">Category: <span className="capitalize">{product.category}</span></p>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-center justify-between">
+                                    <div className='flex items-center gap-2'>
+                                        <p className="text-sm text-[#7c3f00]/70">Qty:</p>
+                                        <select 
+                                            onChange={(e)=> updateCartItem(product._id,Number(e.target.value))}
+                                            value={cartItems[product._id]} 
+                                            className='outline-none border border-[#7c3f00]/20 rounded px-2 py-1 bg-white text-[#7c3f00] text-sm'
+                                        >
+                                            {Array(cartItems[product._id] > 9 ? (cartItems[product._id]): 9).fill('').map((_, index) => (
+                                                <option key={index} value={index + 1}>{index + 1}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <p className="font-bold text-[#7c3f00] text-sm">{currency}{product.offerPrice * product.quantity}</p>
+                                        <button 
+                                            onClick={()=> removeFromCart(product._id)} 
+                                            className="p-2 rounded-full hover:bg-[#7c3f00]/10 transition-colors"
+                                        >
+                                            <img src={assets.remove_icon } alt="remove" className='w-5 h-5' />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                                       {/* Desktop Layout */}
+                                       <div className="hidden md:grid grid-cols-[2fr_1fr_1fr] text-[#7c3f00] items-center text-sm md:text-base font-medium bg-white rounded-lg p-3 shadow-sm border border-[#7c3f00]/10 gap-4">
+                                <div className="flex items-center md:gap-4 gap-3">
+                                    <div className="cursor-pointer w-20 h-20 flex items-center justify-center border border-[#7c3f00]/20 rounded-lg bg-[#faf0e6]">
+                                        {product.isMenuItem ? (
+                                            product.images[0].startsWith('/') ? (
+                                                <img 
+                                                    className="max-w-full h-full object-cover rounded-lg" 
+                                                    src={product.images[0]} 
+                                                    alt={product.name} 
+                                                />
+                                            ) : (
+                                                <span className="text-3xl">{product.images[0]}</span>
+                                            )
+                                        ) : (
+                                            <img 
+                                                className="max-w-full h-full object-cover rounded-lg" 
+                                                src={product.images[0]} 
+                                                alt={product.name} 
+                                            />
+                                        )}
                                 </div>
                                 <div>
-                                    <p className="hidden md:block font-semibold">{product.name}</p>
-                                    <div className="font-normal text-gray-500/70">
-                                        <p>Weight: <span>{product.weight || "N/A"}</span></p>
-                                        <div className='flex items-center'>
+                                        <p className="font-semibold text-[#7c3f00] mb-1">{product.name}</p>
+                                        {product.description && (
+                                            <p className="text-xs text-[#7c3f00]/70 mb-2">{product.description}</p>
+                                        )}
+                                        {product.extra && (
+                                            <p className="text-xs text-[#7c3f00]/60 italic mb-2">{product.extra}</p>
+                                        )}
+                                        <div className="font-normal text-[#7c3f00]/70">
+                                            <p>Category: <span className="capitalize">{product.category}</span></p>
+                                            <div className='flex items-center gap-2 mt-1'>
                                             <p>Qty:</p>
-                                            <select onChange={(e)=> updateCartItem(product._id,Number(e.target.value))}
-                                            value={cartItems[product._id]} className='outline-none'>
+                                                <select 
+                                                    onChange={(e)=> updateCartItem(product._id,Number(e.target.value))}
+                                                    value={cartItems[product._id]} 
+                                                    className='outline-none border border-[#7c3f00]/20 rounded px-2 py-1 bg-white text-[#7c3f00]'
+                                                >
                                                 {Array(cartItems[product._id] > 9 ? (cartItems[product._id]): 9).fill('').map((_, index) => (
                                                     <option key={index} value={index + 1}>{index + 1}</option>
                                                 ))}
@@ -214,136 +269,167 @@ const Cart = () => {
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-center">{currency}{product.offerPrice * product.quantity}</p>
-                            <button onClick={()=> removeFromCart(product._id)} className="cursor-pointer mx-auto">
+                                <p className="text-center font-bold text-[#7c3f00]">{currency}{product.offerPrice * product.quantity}</p>
+                                <button 
+                                    onClick={()=> removeFromCart(product._id)} 
+                                    className="cursor-pointer mx-auto p-2 rounded-full hover:bg-[#7c3f00]/10 transition-colors"
+                                >
                                 <img src={assets.remove_icon } alt="remove" className='inline-block w-6 h-6' />
-                            </button>
-                        </div>)
-                    )}
+                                           </button>
+                                       </div>
+                                   </div>
+                               ))}
+                        </div>
+                    </div>
 
-                    <button onClick={()=> {navigate("/products");scrollTo(0,0);}} className="group cursor-pointer flex items-center mt-8 gap-2 text-indigo-500 font-medium">
+                    <button onClick={()=> {navigate("/menu");scrollTo(0,0);}} className="group cursor-pointer flex items-center mt-6 gap-2 text-[#7c3f00] font-medium hover:text-[#a0522d] transition-colors">
                         <img src={assets.arrow_right_icon_colored} alt="arrow" className='group-hover:translate-x-1 transition-all duration-300 ease-in-out'/> 
                         Continue Shopping
                     </button>
 
                 </div>
 
-                <div className="max-w-[360px] w-full bg-gray-100/40 p-5 max-md:mt-16 border border-gray-300/70">
-                    <h2 className="text-xl md:text-xl font-medium">Order Summary</h2>
-                    <hr className="border-gray-300 my-5" />
+                {/* Simple Cart Summary */}
+                <div className="max-w-[360px] w-full bg-[#faf0e6] p-6 max-md:mt-16 border border-[#7c3f00]/20 rounded-lg shadow-lg lg:sticky lg:top-24 lg:self-start">
+                    <h2 className="text-xl md:text-xl font-bold text-[#7c3f00] mb-4">Cart Summary</h2>
+                    <hr className="border-[#7c3f00]/20 my-5" />
 
-                    <div className="mb-6">
-                        <p className="text-sm font-medium uppercase">Delivery Address</p>
-                        <div className="relative flex justify-between items-start mt-2">
-                            <p className="text-gray-500">{selectedAddress ? `${selectedAddress.street},${selectedAddress.city},${selectedAddress.state}` : "No address found"}</p>
-                            <button onClick={() => setShowAddress(!showAddress)} className="text-indigo-500 hover:underline cursor-pointer">
-                                Change
-                            </button>
-                            {showAddress && (
-                                <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full z-10">
-                                    {address.map((addr, idx) => (
-                                        <p
-                                            key={addr._id || idx}
-                                            onClick={() => { setSelectedAddress(addr); setShowAddress(false); }}
-                                            className={`text-gray-500 p-2 hover:bg-gray-100 cursor-pointer${selectedAddress && selectedAddress._id === addr._id ? ' bg-gray-200' : ''}`}
-                                        >
-                                            {addr.street}, {addr.city}, {addr.state}
-                                        </p>
-                                    ))}
-                                    <p onClick={() => navigate("/add-address")} className="text-indigo-500 text-center cursor-pointer p-2 hover:bg-indigo-500/10">
-                                        Add address
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-
-                        <p className="text-sm font-medium uppercase mt-6">Payment Method</p>
-
-                        <select onChange={(e)=> setPaymentOption(e.target.value)} className="w-full border border-gray-300 bg-white px-3 py-2 mt-2 outline-none">
-                            <option value="COD">Cash On Delivery</option>
-                            <option value="Online">Online Payment</option>
-                        </select>
-                    </div>
-
-                    <hr className="border-gray-300" />
-
-                    <div className="text-gray-500 mt-4 space-y-2">
+                    <div className="text-[#7c3f00] mt-4 space-y-2">
                         <p className="flex justify-between">
-                            <span>Price</span><span>{currency}{getCartAmount()}</span>
+                            <span>Total Items:</span><span>{getCartCount()}</span>
                         </p>
                         <p className="flex justify-between">
-                            <span>Shipping Fee</span><span className="text-green-600">Free</span>
+                            <span>Subtotal:</span><span>{currency}{getCartAmount()}</span>
                         </p>
-                        <p className="flex justify-between">
-                            <span>Tax (2%)</span><span>{currency}{getCartAmount()*0.02} </span>
-                        </p>
-                        <p className="flex justify-between text-lg font-medium mt-3">
-                            <span>Total Amount:</span><span>{currency}{getCartAmount()+ getCartAmount()*0.02}</span>
+                        <p className="flex justify-between text-lg font-bold mt-3 pt-3 border-t border-[#7c3f00]/20">
+                            <span>Total Amount:</span><span className="text-[#7c3f00]">{currency}{getCartAmount()}</span>
                         </p>
                     </div>
 
-                    <button onClick={handlePlaceOrder} className="w-full py-3 mt-6 cursor-pointer bg-indigo-500 text-white font-medium hover:bg-indigo-600 transition">
-                        {
-                            paymentOption === "COD" ? "Place Order" : "Proceed to Checkout"
-                        }
+                    <button 
+                        onClick={handlePlaceOrder}
+                        className="w-full py-3 mt-6 bg-[#7c3f00] text-white font-semibold hover:bg-[#a0522d] transition-colors rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? 'Placing Order...' : 'Place Order'}
                     </button>
                 </div>
             </div>
 
-            {/* Confirmation Dialog */}
-            {showConfirmDialog && (
-                <div className="fixed inset-0 backdrop-blur-sm bg-black/10 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Confirm Order</h3>
+            {/* Order Modal */}
+            {showOrderModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+                        <h3 className="text-xl font-bold text-[#7c3f00] mb-4">Place Your Order</h3>
                         
-                        <div className="mb-6">
-                            <p className="text-gray-600 mb-3">Please review your order details:</p>
-                            
-                            <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                                <div className="mb-3">
-                                    <p className="text-sm font-medium text-gray-700">Delivery Address:</p>
-                                    <p className="text-sm text-gray-600">
-                                        {selectedAddress ? `${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state}` : "No address found"}
-                                    </p>
+                        <div className="space-y-4">
+                            {/* Table Number */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                    Table Number *
+                                </label>
+                                <input
+                                    type="number"
+                                    value={tableNumber}
+                                    onChange={(e) => setTableNumber(e.target.value)}
+                                    placeholder="Enter table number"
+                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
+                                    min="1"
+                                    max="50"
+                                    required
+                                />
+                            </div>
+
+                            {/* Customer Name */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                    Customer Name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={customerName}
+                                    onChange={(e) => setCustomerName(e.target.value)}
+                                    placeholder="Enter your name (optional)"
+                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
+                                />
                                 </div>
                                 
-                                <div className="mb-3">
-                                    <p className="text-sm font-medium text-gray-700">Payment Method:</p>
-                                    <p className="text-sm text-gray-600">Cash on Delivery</p>
+                            {/* Order Type */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                    Order Type
+                                </label>
+                                <select
+                                    value={orderType}
+                                    onChange={(e) => setOrderType(e.target.value)}
+                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
+                                >
+                                    <option value="dine-in">Dine In</option>
+                                    <option value="takeaway">Takeaway</option>
+                                </select>
                                 </div>
                                 
+                            {/* Special Instructions */}
                                 <div>
-                                    <p className="text-sm font-medium text-gray-700">Total Amount:</p>
-                                    <p className="text-lg font-bold text-indigo-600">
-                                        {currency}{getCartAmount() + getCartAmount() * 0.02}
-                                    </p>
+                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                    Special Instructions
+                                </label>
+                                <textarea
+                                    value={specialInstructions}
+                                    onChange={(e) => setSpecialInstructions(e.target.value)}
+                                    placeholder="Any special requests or instructions..."
+                                    rows="3"
+                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20 resize-none"
+                                />
+                            </div>
+
+                            {/* Order Summary */}
+                            <div className="bg-[#faf0e6] p-4 rounded-lg">
+                                <h4 className="font-semibold text-[#7c3f00] mb-2">Order Summary</h4>
+                                <div className="space-y-1 text-sm">
+                                    <p>Items: {getCartCount()}</p>
+                                    <p>Total: {currency}{getCartAmount()}</p>
+                                    <p>Table: {tableNumber || 'Not specified'}</p>
                                 </div>
                             </div>
-                            
-                            <p className="text-sm text-gray-600">
-                                Are you sure you want to place this order? You will pay {currency}{getCartAmount() + getCartAmount() * 0.02} on delivery.
-                            </p>
                         </div>
                         
-                        <div className="flex gap-3">
+                        {/* Modal Buttons */}
+                        <div className="flex gap-3 mt-6">
                             <button
-                                onClick={cancelOrder}
-                                className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition"
+                                onClick={() => setShowOrderModal(false)}
+                                className="flex-1 py-2 px-4 border border-[#7c3f00]/20 text-[#7c3f00] rounded-lg hover:bg-[#7c3f00]/10 transition-colors"
+                                disabled={isSubmitting}
                             >
                                 Cancel
                             </button>
                             <button
-                                onClick={confirmCODOrder}
-                                className="flex-1 py-2 px-4 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition"
+                                onClick={submitOrder}
+                                className="flex-1 py-2 px-4 bg-[#7c3f00] text-white rounded-lg hover:bg-[#a0522d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isSubmitting || !tableNumber}
                             >
-                                Confirm Order
+                                {isSubmitting ? 'Placing Order...' : 'Confirm Order'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
         </>
-    ) : null;
+    ) : (
+        <div className="min-h-screen flex items-center justify-center mt-20 pt-8">
+            <div className="text-center">
+                <div className="text-6xl mb-4">🛒</div>
+                <h1 className="text-3xl font-bold text-[#7c3f00] mb-4">Your Cart is Empty</h1>
+                <p className="text-[#7c3f00]/70 mb-6">Looks like you haven't added any items to your cart yet.</p>
+                            <button
+                    onClick={() => navigate("/menu")} 
+                    className="px-6 py-3 bg-[#7c3f00] text-white rounded-lg font-semibold hover:bg-[#a0522d] transition-colors"
+                >
+                    Browse Menu
+                            </button>
+                        </div>
+                    </div>
+    );
 }
 
 export default Cart;

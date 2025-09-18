@@ -1,55 +1,77 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-    userId: {
-        type: String,
-        ref: 'user',
-        required: true
+    tableNumber: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 50
     },
-    items :[
-        {
-            product: {
-                type: String,
-                ref: 'product',
-                required: true
-            },
-            quantity: {
-                type: Number,
-                required: true,
-
-            },
+    customerName: {
+        type: String,
+        default: "Guest"
+    },
+    items: [{
+        name: {
+            type: String,
+            required: true
+        },
+        price: {
+            type: Number,
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true,
+            min: 1
+        },
+        category: {
+            type: String,
+            required: true
+        },
+        image: {
+            type: String,
+            default: ""
         }
-        
-    ],
-    amount: {
+    }],
+    totalAmount: {
         type: Number,
         required: true
     },
-
-    address: {
-        type: String,
-        ref: 'address',
-        required: true
-    },
-
     status: {
         type: String,
-        default: 'Order Placed'
+        enum: ['pending', 'preparing', 'ready', 'completed', 'cancelled'],
+        default: 'pending'
     },
-    paymentType: {
+    orderType: {
         type: String,
-        required: true
+        enum: ['dine-in', 'takeaway'],
+        default: 'dine-in'
     },
-    isPaid: {
-        type: Boolean,
-        default: false
+    specialInstructions: {
+        type: String,
+        default: ""
+    },
+    orderTime: {
+        type: Date,
+        default: Date.now
+    },
+    estimatedTime: {
+        type: Number, // in minutes
+        default: 15
+    },
+    completedTime: {
+        type: Date,
+        default: null
     }
-
-}, 
-{
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+}, {
+    timestamps: true
 });
-                
 
-const Order = mongoose.models.order || mongoose.model('order', orderSchema);
+// Index for better query performance
+orderSchema.index({ tableNumber: 1, status: 1 });
+orderSchema.index({ orderTime: -1 });
+
+const Order = mongoose.model("Order", orderSchema);
+
 export default Order;

@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { UseAppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import toast from 'react-hot-toast'
-import logo from '../assets/logo.jpg'
 
 const Navbar = () => {
     const [open, setOpen] = React.useState(false)
+    const [isScrolled, setIsScrolled] = useState(false)
     const menuRef = useRef();
     const {user,setUser,navigate,showUserLogin,setShowUserLogin,searchQuery,setSearchQuery,getCartCount,axios}=UseAppContext();
 
@@ -26,6 +26,17 @@ const Navbar = () => {
             toast.error(error.message);
         }
     }
+
+    // Handle scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            setIsScrolled(scrollTop > 50);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Close mobile menu on route change or link click
     useEffect(() => {
@@ -78,40 +89,96 @@ const Navbar = () => {
         setOpen(false);
     };
 
+    // Handle Our Story click
+    const handleOurStoryClick = (e) => {
+        e.preventDefault();
+        if (window.location.pathname === "/") {
+            scrollToSection("our-story-section");
+        } else {
+            navigate("/", { replace: false });
+            setTimeout(() => scrollToSection("our-story-section"), 100);
+        }
+        setOpen(false);
+    };
+
+    // Handle Our Menu click
+    const handleOurMenuClick = (e) => {
+        e.preventDefault();
+        if (window.location.pathname === "/") {
+            scrollToSection("categories-section");
+        } else {
+            navigate("/", { replace: false });
+            setTimeout(() => scrollToSection("categories-section"), 100);
+        }
+        setOpen(false);
+    };
+
+    // Handle What's New click
+    const handleWhatsNewClick = (e) => {
+        e.preventDefault();
+        if (window.location.pathname === "/") {
+            scrollToSection("whats-new-section");
+        } else {
+            navigate("/", { replace: false });
+            setTimeout(() => scrollToSection("whats-new-section"), 100);
+        }
+        setOpen(false);
+    };
+
     return (
-    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
-        <div onClick={()=> navigate('/')} className="flex items-center gap-2 cursor-pointer">
-            <img src={logo} alt="Salasar Grocery Store Logo" className="h-10 w-10 object-contain" />
-            <span className="font-bold text-xl text-indigo-700">SALASAR</span>
+    <nav className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 transition-all duration-300 ${
+        isScrolled 
+            ? 'bg-[#faf0e6]/95 backdrop-blur-md shadow-lg border-b border-[#7c3f00]/10' 
+            : 'bg-[#faf0e6] shadow-sm'
+    }`}>
+        <div onClick={()=> navigate('/')} className="flex items-center gap-2 cursor-pointer group">
+            <div className={`w-10 h-10 flex items-center justify-center transition-transform duration-300 ${
+                isScrolled ? 'scale-90' : 'scale-100'
+            } group-hover:scale-105`}>
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    {/* Continuous line coffee cup with heart handle */}
+                    <path d="M10 15c0-2 2-4 4-4h12c2 0 4 2 4 4v6c0 2-2 4-4 4H14c-2 0-4-2-4-4v-6z" stroke="#7c3f00" strokeWidth="2" fill="white"/>
+                    {/* Handle with integrated heart */}
+                    <path d="M26 17c1.5 0 3 1.5 3 3s-1.5 3-3 3c-0.5 0-1-0.2-1.4-0.6" stroke="#7c3f00" strokeWidth="2" fill="none"/>
+                    <path d="M24.6 19.4c0.4-0.4 0.9-0.4 1.4 0 0.4 0.4 0.4 0.9 0 1.4" stroke="#7c3f00" strokeWidth="1.5" fill="none"/>
+                    {/* Steam lines */}
+                    <path d="M12 11c0.5-1 1.5-1.5 2.5-1" stroke="#7c3f00" strokeWidth="1.5" fill="none"/>
+                    <path d="M16 9c0.5-1 1.5-1.5 2.5-1" stroke="#7c3f00" strokeWidth="1.5" fill="none"/>
+                    <path d="M20 11c0.5-1 1.5-1.5 2.5-1" stroke="#7c3f00" strokeWidth="1.5" fill="none"/>
+                    {/* Saucer */}
+                    <ellipse cx="20" cy="29" rx="10" ry="2" fill="#7c3f00"/>
+                    <ellipse cx="20" cy="29" rx="10" ry="2" stroke="#7c3f00" strokeWidth="1"/>
+                </svg>
+            </div>
+            <span className={`font-bold text-xl text-[#7c3f00] transition-all duration-300 ${
+                isScrolled ? 'text-lg' : 'text-xl'
+            }`}>Cafe Culture</span>
         </div>
         {/* Desktop Menu */}
         <div className="hidden sm:flex items-center gap-8">
-            <NavLink to="/">Home</NavLink>
-            <NavLink to="/products">All Product</NavLink>
-            <NavLink to="/" onClick={handleContactClick}>Contact</NavLink>
-            <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
-                <input onChange={(e)=> setSearchQuery(e.target.value)} className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500" type="text" placeholder="Search products" />
-                <svg width="16" height="16" viewBox="0 0  16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10.836 10.615 15 14.695" stroke="#7A7B7D" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path clipRule="evenodd" d="M9.141 11.738c2.729-1.136 4.001-4.224 2.841-6.898S7.67.921 4.942 2.057C2.211 3.193.94 6.281 2.1 8.955s4.312 3.92 7.041 2.783" stroke="#7A7B7D" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-            </div>
+            <NavLink to="/" onClick={handleOurStoryClick} className={`text-[#7c3f00] hover:text-[#a0522d] transition-all duration-300 font-medium hover:scale-105 ${
+                isScrolled ? 'text-sm' : 'text-base'
+            }`}>Our Story</NavLink>
+            <span onClick={handleOurMenuClick} className={`text-[#7c3f00] hover:text-[#a0522d] transition-all duration-300 font-medium hover:scale-105 cursor-pointer ${
+                isScrolled ? 'text-sm' : 'text-base'
+            }`}>Our Menu</span>
+            <NavLink to="/" onClick={handleWhatsNewClick} className={`text-[#7c3f00] hover:text-[#a0522d] transition-all duration-300 font-medium hover:scale-105 ${
+                isScrolled ? 'text-sm' : 'text-base'
+            }`}>What's New</NavLink>
+            <NavLink to="/" onClick={handleContactClick} className={`text-[#7c3f00] hover:text-[#a0522d] transition-all duration-300 font-medium hover:scale-105 ${
+                isScrolled ? 'text-sm' : 'text-base'
+            }`}>Contact Us</NavLink>
             <div onClick={()=> navigate("/cart")} className="relative cursor-pointer">
                 <svg width="18" height="18" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M.583.583h2.333l1.564 7.81a1.17 1.17 0 0 0 1.166.94h5.67a1.17 1.17 0 0 0 1.167-.94l.933-4.893H3.5m2.333 8.75a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0m6.417 0a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0" stroke="#615fff" strokeLinecap="round" strokeLinejoin="round"  />
+                    <path d="M.583.583h2.333l1.564 7.81a1.17 1.17 0 0 0 1.166.94h5.67a1.17 1.17 0 0 0 1.167-.94l.933-4.893H3.5m2.333 8.75a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0m6.417 0a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0" stroke="#7c3f00" strokeLinecap="round" strokeLinejoin="round"  />
                 </svg>
-                <button className="absolute -top-2 -right-3 text-xs text-white bg-indigo-500 w-[18px] h-[18px] rounded-full" >{getCartCount()}</button>
+                <button className="absolute -top-2 -right-3 text-xs text-white bg-[#7c3f00] w-[18px] h-[18px] rounded-full" >{getCartCount()}</button>
             </div>
-            {!user ? (
-                <button className="cursor-pointer px-8 py-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full" onClick={()=>setShowUserLogin(true)}>
-                    Login
-                </button>)
-            :(
+            {user && (
                 <div className='relative group'>
                     <img src={assets.profile_icon} className='w-10' alt="Profile Icon" />
-                    <ul className='hidden group-hover:block absolute top-10 right-0 bg-white shadow border border-gray-200 py-2.5 w-30 rounded-md text-sm z-40'>
-                        <li onClick={() => navigate("my-orders")} className='p-1.5 pl-3 hover:bg-indigo-500/10 cursor-pointer'>My Orders</li>
-                        <li onClick={logout} className='p-1.5 pl-3 hover:bg-indigo-500/10 cursor-pointer'>Logout</li>
+                    <ul className='hidden group-hover:block absolute top-10 right-0 bg-[#faf0e6] shadow border border-[#7c3f00]/20 py-2.5 w-30 rounded-md text-sm z-40'>
+                        <li onClick={logout} className='p-1.5 pl-3 hover:bg-[#7c3f00]/10 cursor-pointer text-[#7c3f00]'>Logout</li>
                     </ul>
                 </div>
             )}
@@ -120,9 +187,9 @@ const Navbar = () => {
         <div className='flex items-center gap-6 sm:hidden'>
             <div onClick={()=> navigate("/cart")} className="relative cursor-pointer">
                 <svg width="18" height="18" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M.583.583h2.333l1.564 7.81a1.17 1.17 0 0 0 1.166.94h5.67a1.17 1.17 0 0 0 1.167-.94l.933-4.893H3.5m2.333 8.75a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0m6.417 0a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0" stroke="#615fff" strokeLinecap="round" strokeLinejoin="round"  />
+                    <path d="M.583.583h2.333l1.564 7.81a1.17 1.17 0 0 0 1.166.94h5.67a1.17 1.17 0 0 0 1.167-.94l.933-4.893H3.5m2.333 8.75a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0m6.417 0a.583.583 0 1 1-1.167 0 .583.583 0 0 1 1.167 0" stroke="#7c3f00" strokeLinecap="round" strokeLinejoin="round"  />
                 </svg>
-                <button className="absolute -top-2 -right-3 text-xs text-white bg-indigo-500 w-[18px] h-[18px] rounded-full" >{getCartCount()}</button>
+                <button className="absolute -top-2 -right-3 text-xs text-white bg-[#7c3f00] w-[18px] h-[18px] rounded-full" >{getCartCount()}</button>
             </div>
             <button
                 onClick={() => setOpen(!open)}
@@ -142,7 +209,7 @@ const Navbar = () => {
         <div
             ref={menuRef}
             id="mobile-menu"
-            className={`${open ? 'flex' : 'hidden'} absolute top-[60px] left-0 w-full bg-white shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden z-50 max-h-[80vh] overflow-y-auto`}
+            className={`${open ? 'flex' : 'hidden'} absolute top-[60px] left-0 w-full bg-[#faf0e6] shadow-md py-4 flex-col items-start gap-2 px-5 text-sm md:hidden z-50 max-h-[80vh] overflow-y-auto`}
         >
             {/* Close button for mobile menu */}
             <button
@@ -154,30 +221,13 @@ const Navbar = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
-            {/* Mobile search bar */}
-            <div className="flex items-center w-full border border-gray-300 px-3 rounded-full mb-2">
-                <input
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500 text-base"
-                    type="text"
-                    placeholder="Search products"
-                />
-                <svg width="16" height="16" viewBox="0 0  16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10.836 10.615 15 14.695" stroke="#7A7B7D" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path clipRule="evenodd" d="M9.141 11.738c2.729-1.136 4.001-4.224 2.841-6.898S7.67.921 4.942 2.057C2.211 3.193.94 6.281 2.1 8.955s4.312 3.92 7.041 2.783" stroke="#7A7B7D" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-            </div>
-            <button className="w-full text-left py-2 px-2 rounded hover:bg-gray-100 focus:outline-indigo-500" onClick={() => handleNavClick("/")}>Home</button>
-            <button className="w-full text-left py-2 px-2 rounded hover:bg-gray-100 focus:outline-indigo-500" onClick={() => handleNavClick("/products")}>All Product</button>
-            {user && <button className="w-full text-left py-2 px-2 rounded hover:bg-gray-100 focus:outline-indigo-500" onClick={() => handleNavClick("/my-orders")}>My Orders</button>}
-            <button className="w-full text-left py-2 px-2 rounded hover:bg-gray-100 focus:outline-indigo-500" onClick={handleContactClick}>Contact</button>
-            {!user ? 
-                (<button className="w-full cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm focus:outline-indigo-500" onClick={()=>{setShowUserLogin(true); setOpen(false);}}>
-                    Login
-                </button>) : 
-                (<button className="w-full cursor-pointer px-6 py-2 mt-2 bg-indigo-500 hover:bg-indigo-600 transition text-white rounded-full text-sm focus:outline-indigo-500" onClick={logout}>
-                    Logout
-                </button>) } 
+                   <button className="w-full text-left py-2 px-2 rounded hover:bg-[#7c3f00]/10 focus:outline-[#7c3f00] text-[#7c3f00]" onClick={handleOurStoryClick}>Our Story</button>
+                   <span className="w-full text-left py-2 px-2 text-[#7c3f00]">Our Menu</span>
+                   <button className="w-full text-left py-2 px-2 rounded hover:bg-[#7c3f00]/10 focus:outline-[#7c3f00] text-[#7c3f00]" onClick={handleWhatsNewClick}>What's New</button>
+                   <button className="w-full text-left py-2 px-2 rounded hover:bg-[#7c3f00]/10 focus:outline-[#7c3f00] text-[#7c3f00]" onClick={handleContactClick}>Contact Us</button>
+                   {user && <button className="w-full cursor-pointer px-6 py-2 mt-2 bg-[#7c3f00] hover:bg-[#a0522d] transition text-white rounded-full text-sm focus:outline-[#7c3f00]" onClick={logout}>
+                       Logout
+                   </button>}
         </div>
     </nav>
     )

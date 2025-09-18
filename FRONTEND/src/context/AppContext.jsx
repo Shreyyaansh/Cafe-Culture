@@ -1,6 +1,7 @@
 import { Children, createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
+import { getMenuItemById, isMenuItem } from "../assets/menuItems";
 import toast from "react-hot-toast";
 export const AppContext = createContext();
 import axios from "axios";
@@ -8,37 +9,17 @@ import axios from "axios";
 
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 
 export const AppContextProvider = ({children})=>{
-    const currency= import.meta.env.VITE_CURRENCY;
+    const currency= import.meta.env.VITE_CURRENCY || '₹';
     const navigate = useNavigate();
     const[user,setUser]= useState(null)
     const[showUserLogin,setShowUserLogin]=useState(false)
-    const[isSeller,setIsSeller]=useState(false)
     const[products,setProducts]=useState([])
     const[cartItems,setCartItems]=useState({})
     const[searchQuery,setSearchQuery]=useState({})
 
-    // Fetch Seller Status
-
-    const fetchSeller = async () => {
-        try {
-            const {data} = await axios.get('/api/seller/is-auth');
-            if(data.success)
-            {
-                setIsSeller(true);
-            }
-
-            else{
-                setIsSeller(false);
-            }
-
-
-        } catch (error) {
-            setIsSeller(false); 
-        }
-    }
 
 
     // Fetch User Auth Status 
@@ -76,6 +57,9 @@ export const AppContextProvider = ({children})=>{
 
     // Add Cart Item
     const addToCart = (itemId) =>{
+        console.log('🛒 Adding to cart:', itemId);
+        console.log('🛒 Current cartItems:', cartItems);
+        
         let cartData = (typeof cartItems === 'object' && !Array.isArray(cartItems)) ? structuredClone(cartItems) : {};
 
         if (cartData[itemId])
@@ -87,6 +71,7 @@ export const AppContextProvider = ({children})=>{
             cartData[itemId]=1;
         }
 
+        console.log('🛒 New cartData:', cartData);
         setCartItems(cartData);
         toast.success("Added to Cart");
     }
@@ -117,32 +102,9 @@ export const AppContextProvider = ({children})=>{
     // Fetch Products on Initial Render
     useEffect(()=>{
         fetchUser();
-        fetchSeller();
         fetchProducts();
-
     },[])
 
-    useEffect(()=>{
-         const updateCart = async ()=>{
-            try {
-                const {data} = await axios.post('/api/cart/update',{cartItems});
-
-                if(!data.success)
-                {
-                    toast.error(data.message);
-                }
-
-
-            } catch (error) {
-                toast.error(error.message); 
-            }
-         }
-
-         if(user)
-         {
-            updateCart();
-         }
-    },[cartItems]);
 
     //Get Cart item count
 
@@ -159,9 +121,20 @@ export const AppContextProvider = ({children})=>{
     const getCartAmount = () => {
         let totalAmount = 0;
         for (const item in cartItems) {
-            let itemInfo = products.find(product => product._id === item);
-            if(cartItems[item] > 0 && itemInfo) {
-                totalAmount += itemInfo.offerPrice * cartItems[item];
+            if(cartItems[item] > 0) {
+                // Check if it's a menu item
+                if (isMenuItem(item)) {
+                    const menuItem = getMenuItemById(item);
+                    if (menuItem) {
+                        totalAmount += menuItem.price * cartItems[item];
+                    }
+                } else {
+                    // Handle database products
+                    let itemInfo = products.find(product => product._id === item);
+                    if(itemInfo) {
+                        totalAmount += itemInfo.offerPrice * cartItems[item];
+                    }
+                }
             }
         } 
         return Math.floor(totalAmount * 100) / 100; 
@@ -169,7 +142,7 @@ export const AppContextProvider = ({children})=>{
 
 
 
-    const value = {navigate,user,setUser,isSeller,setIsSeller,products,currency,addToCart,updateCartItem,removeFromCart,cartItems,showUserLogin,setShowUserLogin,searchQuery,setSearchQuery,getCartAmount,getCartCount,axios,fetchProducts,setCartItems};
+    const value = {navigate,user,setUser,products,currency,addToCart,updateCartItem,removeFromCart,cartItems,showUserLogin,setShowUserLogin,searchQuery,setSearchQuery,getCartAmount,getCartCount,axios,fetchProducts,setCartItems};
 
     return(
         <AppContext.Provider value={value}>
