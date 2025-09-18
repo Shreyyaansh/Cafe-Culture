@@ -2,13 +2,11 @@
 import remove_icon from "./remove_icon.svg";
 import arrow_right_icon_colored from "./arrow_right_icon_colored.svg";
 import profile_icon from "./profile_icon.png";
-import add_address_iamge from "./add_address_image.svg";
 
 export const assets = {
   remove_icon,
   arrow_right_icon_colored,
   profile_icon,
-  add_address_iamge,
 };
 
 // Dummy data for development/testing
