@@ -2,12 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { UseAppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
 import { getMenuItemById, isMenuItem } from '../assets/menuItems';
+import { menuImageMapping } from '../assets/cafeCultureImages';
 import toast from 'react-hot-toast';
 
 
 const Cart = () => {
     
     const[cartArray,setCartArray]=useState([]);
+
+    // Helper function to get the correct image for cart items
+    const getItemImage = (item) => {
+        if (item.isMenuItem) {
+            // For menu items, use the image mapping
+            const imageKey = item.name;
+            return menuImageMapping[imageKey] || '🍽️';
+        } else {
+            // For database products, use the original image
+            return item.images[0] || '🍽️';
+        }
+    };
     const [tableNumber, setTableNumber] = useState('');
     const [customerName, setCustomerName] = useState('');
     const [specialInstructions, setSpecialInstructions] = useState('');
@@ -95,7 +108,7 @@ const Cart = () => {
                     price: item.offerPrice,
                     quantity: item.quantity,
                     category: item.category,
-                    image: item.images[0] || "🍽️"
+                    image: getItemImage(item)
                 })),
                 totalAmount: getCartAmount(),
                 orderType: orderType,
@@ -170,23 +183,18 @@ const Cart = () => {
                                        <div className="md:hidden bg-white rounded-lg p-4 shadow-sm border border-[#7c3f00]/10">
                                 <div className="flex items-start gap-3 mb-3">
                                     <div className="w-16 h-16 flex items-center justify-center border border-[#7c3f00]/20 rounded-lg bg-[#faf0e6] flex-shrink-0">
-                                        {product.isMenuItem ? (
-                                            product.images[0].startsWith('/') ? (
+                                        {(() => {
+                                            const image = getItemImage(product);
+                                            return typeof image === 'string' && image.startsWith('/') ? (
                                                 <img 
                                                     className="max-w-full h-full object-cover rounded-lg" 
-                                                    src={product.images[0]} 
+                                                    src={image} 
                                                     alt={product.name} 
                                                 />
                                             ) : (
-                                                <span className="text-2xl">{product.images[0]}</span>
-                                            )
-                                        ) : (
-                                            <img 
-                                                className="max-w-full h-full object-cover rounded-lg" 
-                                                src={product.images[0]} 
-                                                alt={product.name} 
-                                            />
-                                        )}
+                                                <span className="text-2xl">{image}</span>
+                                            );
+                                        })()}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="font-semibold text-[#7c3f00] mb-1 text-sm">{product.name}</p>
@@ -226,24 +234,19 @@ const Cart = () => {
                                        <div className="hidden md:grid grid-cols-[2fr_1fr_1fr] text-[#7c3f00] items-center text-sm md:text-base font-medium bg-white rounded-lg p-3 shadow-sm border border-[#7c3f00]/10 gap-4">
                                 <div className="flex items-center md:gap-4 gap-3">
                                     <div className="cursor-pointer w-20 h-20 flex items-center justify-center border border-[#7c3f00]/20 rounded-lg bg-[#faf0e6]">
-                                        {product.isMenuItem ? (
-                                            product.images[0].startsWith('/') ? (
+                                        {(() => {
+                                            const image = getItemImage(product);
+                                            return typeof image === 'string' && image.startsWith('/') ? (
                                                 <img 
                                                     className="max-w-full h-full object-cover rounded-lg" 
-                                                    src={product.images[0]} 
+                                                    src={image} 
                                                     alt={product.name} 
                                                 />
                                             ) : (
-                                                <span className="text-3xl">{product.images[0]}</span>
-                                            )
-                                        ) : (
-                                            <img 
-                                                className="max-w-full h-full object-cover rounded-lg" 
-                                                src={product.images[0]} 
-                                                alt={product.name} 
-                                            />
-                                        )}
-                                </div>
+                                                <span className="text-3xl">{image}</span>
+                                            );
+                                        })()}
+                                    </div>
                                 <div>
                                         <p className="font-semibold text-[#7c3f00] mb-1">{product.name}</p>
                                         {product.description && (

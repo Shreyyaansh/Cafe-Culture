@@ -9,7 +9,11 @@ import axios from "axios";
 
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+
+// Set base URL with proper fallback
+const backendURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+console.log('Backend URL:', backendURL); // Debug log
+axios.defaults.baseURL = backendURL;
 
 export const AppContextProvider = ({children})=>{
     const currency= import.meta.env.VITE_CURRENCY || '₹';
