@@ -26,36 +26,15 @@ export const AppContextProvider = ({children})=>{
 
 
 
-    // Fetch User Auth Status 
+    // Simplified app: no auth API; default to guest
     const fetchUser = async ()=>{
-        try {
-            const {data} = await axios.get('/api/user/is-auth');
-            if(data.success)
-            {
-                setUser(data.user);
-                setCartItems((typeof data.user.cartItems === 'object' && !Array.isArray(data.user.cartItems)) ? data.user.cartItems : {});
-            }
-
-        } catch (error) {
-            setUser(null);
-        }
+        setUser(null);
+        setCartItems({});
     }
 
+    // Simplified app: no backend products; rely on local menu only
     const  fetchProducts = async ()=>{
-        try {
-
-            const {data} = await axios.get('api/product/list');
-            if(data.success)
-            {
-                setProducts(data.products);
-            }
-            else{
-                toast.error(data.message);
-            }
-            
-        } catch (error) {
-            toast.error(error.message);
-        }
+        setProducts([]);
     }
 
 

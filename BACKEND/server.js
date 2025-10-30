@@ -3,12 +3,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
-import userRouter from './routes/userRoute.js';
-import sellerRouter from './routes/sellerRoute.js';
-import connectCloudinary from './config/cloudinary.js';
-import productRouter from './routes/productRoute.js';
 import cartRouter from './routes/cartRoute.js';
-import addressRouter from './routes/addressRoute.js';
 import orderRouter from './routes/orderRoute.js';
 
 const app = express();
@@ -17,7 +12,6 @@ dotenv.config(); // Load environment variables from .env file
 
 
 await connectDB();
-await connectCloudinary(); 
 
 // CORS configuration for production
 const allowedOrigins = [
@@ -60,11 +54,7 @@ app.get('/', (req, res) => {
     }
 );  
 
-app.use('/api/user', userRouter);
-app.use('/api/seller', sellerRouter); 
-app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter); 
-app.use('/api/address', addressRouter); 
 app.use('/api/order',orderRouter);
 
 

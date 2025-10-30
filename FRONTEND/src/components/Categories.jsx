@@ -65,8 +65,7 @@ const Categories = () => {
           {foodCategories.map((category, index) => (
             <div
               key={index}
-              className='group cursor-pointer py-8 px-6 gap-4 rounded-xl flex flex-col justify-center items-center transition-all transform hover:scale-105 hover:shadow-lg border border-[#7c3f00]/10'
-              style={{background: category.bgColor}}
+              className='group cursor-pointer py-8 px-6 gap-4 rounded-xl flex flex-col justify-center items-center transition-all transform hover:scale-105 hover:shadow-lg border border-[#7c3f00]/10 bg-white'
               onClick={() => {
                 navigate('/menu');
                 window.scrollTo(0,0);

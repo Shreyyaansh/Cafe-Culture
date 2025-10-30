@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import homeBanner from '../assets/homebanner.png';
 
 const MainBanner = () => {
   const navigate = useNavigate();
@@ -13,26 +14,31 @@ const MainBanner = () => {
   };
 
   return (
-    <div className='relative w-screen h-[200px] xs:h-[220px] sm:h-[280px] md:h-[320px] lg:h-[380px] bg-[#f5e6d3] -ml-6 md:-ml-16 lg:-ml-24 xl:-ml-32 mt-30 shadow-2xl border-b-4 border-[#7c3f00]/20 border-t-4 border-[#7c3f00]/20'>
-      {/* Coffee pattern overlay */}
-      <div className='absolute inset-0 opacity-10'>
-        <div className='w-full h-full bg-[url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="4"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")]'></div>
-      </div>
+    <div className='relative w-screen h-[220px] sm:h-[280px] md:h-[340px] lg:h-[420px] -mx-6 md:-mx-16 lg:-mx-24 xl:-mx-32 mt-[90px] shadow-2xl border-b-4 border-[#6F4E37]/20 border-t-4 border-[#6F4E37]/20 overflow-hidden'>
+      {/* Responsive image: contain on small screens, cover on md+ */}
+      <img
+        src={homeBanner}
+        alt="Cafe Culture banner"
+        className='absolute inset-0 w-full h-full object-cover object-center select-none'
+        draggable={false}
+      />
+      {/* Soft overlay for text readability on bright images */}
+      <div className='absolute inset-0 bg-white/10 md:bg-white/0 pointer-events-none' />
 
       {/* Text container */}
       <div className='absolute inset-0 flex items-center justify-center p-4 sm:p-6'>
-        <div className='text-center max-w-4xl mx-auto px-4'>
-          <h1 className='text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#7c3f00] leading-tight mb-3 sm:mb-4 drop-shadow-lg'>
+        <div className='text-center max-w-4xl px-4 -translate-x-8 sm:-translate-x-16 md:-translate-x-24 lg:-translate-x-32'>
+          <h1 className='text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#4A2C2A] leading-tight mb-3 sm:mb-4 drop-shadow-lg'>
             Cafe Culture
           </h1>
           
-          <p className='text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-[#7c3f00]/90 mb-4 sm:mb-6 max-w-3xl mx-auto leading-relaxed font-medium animate-pulse'>
+          <p className='text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-[#4A2C2A]/90 mb-4 sm:mb-6 max-w-3xl mx-auto leading-relaxed font-medium animate-pulse'>
             Essence of Elegance
           </p>
 
           <div className='flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4'>
             <button
-              className='px-4 py-2 sm:px-6 md:px-8 sm:py-3 rounded-full bg-[#f5e6d3] text-[#7c3f00] font-semibold hover:bg-white transition-all text-sm sm:text-base md:text-lg shadow-xl focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20 transform hover:scale-110 hover:shadow-2xl border-2 border-[#7c3f00]/30'
+              className='px-5 py-2 rounded-lg border border-[#6F4E37] text-[#6F4E37] bg-transparent font-medium transition-colors duration-200 text-sm sm:text-base md:text-lg shadow-none focus:outline-none focus:ring-2 focus:ring-[#6F4E37]/30 hover:bg-[#6F4E37] hover:text-white hover:border-[#6F4E37] active:bg-[#6F4E37]/90'
               onClick={() => navigate('/menu')}
             >
               Explore the full menu
