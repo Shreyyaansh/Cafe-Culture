@@ -3,13 +3,21 @@ import mongoose from "mongoose";
 const orderSchema = new mongoose.Schema({
     tableNumber: {
         type: Number,
-        required: true,
+        required: false,
         min: 1,
         max: 50
     },
     customerName: {
         type: String,
-        default: "Guest"
+        required: true
+    },
+    phone: {
+        type: String,
+        required: true
+    },
+    address: {
+        type: String,
+        required: true
     },
     items: [{
         name: {
@@ -63,6 +71,14 @@ const orderSchema = new mongoose.Schema({
     completedTime: {
         type: Date,
         default: null
+    },
+    emailSent: {
+        type: Boolean,
+        default: false
+    },
+    emailError: {
+        type: String,
+        default: ""
     }
 }, {
     timestamps: true

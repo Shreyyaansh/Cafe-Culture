@@ -1,16 +1,17 @@
 import Order from "../models/Order.js";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
 
 // Create a new order
 export const createOrder = async (req, res) => {
     try {
-        const { tableNumber, customerName, items, totalAmount, orderType, specialInstructions } = req.body;
+        const { tableNumber, customerName, phone, address, items, totalAmount, orderType, specialInstructions } = req.body;
 
         // Validate required fields
-        if (!tableNumber || !items || !totalAmount) {
+        if (!customerName || !phone || !address || !items || !totalAmount) {
             return res.status(400).json({
                 success: false,
-                message: "Table number, items, and total amount are required"
+                message: "Customer name, phone, address, items, and total amount are required"
             });
         }
 
@@ -25,7 +26,9 @@ export const createOrder = async (req, res) => {
         // Create new order
         const order = new Order({
             tableNumber,
-            customerName: customerName || "Guest",
+            customerName,
+            phone,
+            address,
             items,
             totalAmount,
             orderType: orderType || "dine-in",
@@ -33,6 +36,86 @@ export const createOrder = async (req, res) => {
         });
 
         await order.save();
+
+        // Attempt to send notification email (non-blocking for order creation)
+        try {
+            if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+                order.emailSent = false;
+                order.emailError = 'SMTP credentials missing';
+                await order.save();
+                throw new Error('SMTP credentials missing');
+            }
+
+            const resolvedHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+            const resolvedPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587;
+            const resolvedSecure = process.env.SMTP_SECURE === 'true' ? true : false;
+            const transporter = nodemailer.createTransport({
+                host: resolvedHost,
+                port: resolvedPort,
+                secure: resolvedSecure,
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS
+                }
+            });
+
+            const toAddress = process.env.ORDER_NOTIFY_TO || process.env.SMTP_USER;
+            const fromAddress = process.env.MAIL_FROM || process.env.SMTP_USER;
+
+            const itemsHtml = order.items.map(i => `
+                <tr>
+                    <td style="padding:6px 8px;border:1px solid #eee;">${i.name}</td>
+                    <td style="padding:6px 8px;border:1px solid #eee;">${i.quantity}</td>
+                    <td style="padding:6px 8px;border:1px solid #eee;">₹${i.price}</td>
+                    <td style="padding:6px 8px;border:1px solid #eee;">₹${i.price * i.quantity}</td>
+                </tr>
+            `).join('');
+
+            const html = `
+                <div style="font-family:Arial, sans-serif;color:#333;">
+                  <h2>New Order Placed</h2>
+                  <p><strong>Order ID:</strong> ${order._id}</p>
+                  <p><strong>Time:</strong> ${new Date(order.orderTime).toLocaleString()}</p>
+                  <p><strong>Customer:</strong> ${order.customerName}</p>
+                  <p><strong>Phone:</strong> ${order.phone}</p>
+                  <p><strong>Address:</strong> ${order.address}</p>
+                  <p><strong>Table Number:</strong> ${order.tableNumber ?? 'N/A'}</p>
+                  <p><strong>Order Type:</strong> ${order.orderType}</p>
+                  <h3>Items</h3>
+                  <table style="border-collapse:collapse;min-width:400px;">
+                    <thead>
+                      <tr>
+                        <th style="text-align:left;padding:6px 8px;border:1px solid #eee;">Item</th>
+                        <th style="text-align:left;padding:6px 8px;border:1px solid #eee;">Qty</th>
+                        <th style="text-align:left;padding:6px 8px;border:1px solid #eee;">Price</th>
+                        <th style="text-align:left;padding:6px 8px;border:1px solid #eee;">Subtotal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${itemsHtml}
+                    </tbody>
+                  </table>
+                  <p style="margin-top:12px;"><strong>Total Amount:</strong> ₹${order.totalAmount}</p>
+                  ${order.specialInstructions ? `<p><strong>Special Instructions:</strong> ${order.specialInstructions}</p>` : ''}
+                </div>
+            `;
+
+            await transporter.sendMail({
+                from: fromAddress,
+                to: toAddress,
+                subject: `New Order #${order._id}`,
+                html
+            });
+            // mark email as sent on the order
+            order.emailSent = true;
+            order.emailError = "";
+            await order.save();
+        } catch (mailErr) {
+            // persist failure info but do not block response
+            order.emailSent = false;
+            order.emailError = mailErr?.message || String(mailErr);
+            try { await order.save(); } catch (_) {}
+        }
 
         res.status(201).json({
             success: true,

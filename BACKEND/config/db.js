@@ -9,7 +9,11 @@ const connectDB = async () => {
             console.log("MongoDB connected successfully");
         });
 
-        const mongoURI = process.env.MONGODB_URI || `mongodb+srv://shrey08:shrey08@cluster0.5vkidji.mongodb.net/Cafe-Culture`;
+        const mongoURI = process.env.MONGODB_URI;
+        if (!mongoURI) {
+            throw new Error('MONGODB_URI is not set. Please configure it in your environment variables.');
+        }
+
         await mongoose.connect(mongoURI);
     } catch (error) {
         console.error("MongoDB connection failed:", error);

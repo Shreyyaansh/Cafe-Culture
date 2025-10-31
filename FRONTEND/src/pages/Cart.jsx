@@ -23,6 +23,8 @@ const Cart = () => {
     };
     const [tableNumber, setTableNumber] = useState('');
     const [customerName, setCustomerName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
     const [specialInstructions, setSpecialInstructions] = useState('');
     const [orderType, setOrderType] = useState('dine-in');
     const [showOrderModal, setShowOrderModal] = useState(false);
@@ -87,8 +89,8 @@ const Cart = () => {
 
     // Submit order to database
     const submitOrder = async () => {
-        if (!tableNumber) {
-            toast.error("Please enter a table number");
+        if (!customerName?.trim() || !phone?.trim() || !address?.trim()) {
+            toast.error("Please fill customer name, phone number, and address");
             return;
         }
 
@@ -101,8 +103,10 @@ const Cart = () => {
 
         try {
             const orderData = {
-                tableNumber: parseInt(tableNumber),
-                customerName: customerName || "Guest",
+                ...(tableNumber ? { tableNumber: parseInt(tableNumber) } : {}),
+                customerName: customerName,
+                phone: phone,
+                address: address,
                 items: cartArray.map(item => ({
                     name: item.name,
                     price: item.offerPrice,
@@ -125,12 +129,15 @@ const Cart = () => {
                 setCartItems({}); // Clear cart
                 setTableNumber('');
                 setCustomerName('');
+                setPhone('');
+                setAddress('');
                 setSpecialInstructions('');
                 setShowOrderModal(false);
                 navigate('/'); // Redirect to home
             } else {
                 toast.error(data.message || "Failed to place order");
             }
+
         } catch (error) {
             console.error("❌ Error submitting order:", error);
             console.error("❌ Error response:", error.response?.data);
@@ -147,6 +154,15 @@ const Cart = () => {
     // Handle place order button click
     const handlePlaceOrder = () => {
         setShowOrderModal(true);
+    };
+
+    const handleEmptyCart = () => {
+        if (!cartItems || Object.keys(cartItems).length === 0) return;
+        const ok = window.confirm('Empty the cart?');
+        if (!ok) return;
+        setCartItems({});
+        setCartArray([]);
+        toast.success('Cart emptied');
     };
 
 
@@ -316,6 +332,13 @@ const Cart = () => {
                     >
                         {isSubmitting ? 'Placing Order...' : 'Place Order'}
                     </button>
+                    <button
+                        onClick={handleEmptyCart}
+                        className="w-full py-2 mt-3 border border-[#7c3f00]/30 text-[#7c3f00] font-semibold hover:bg-[#7c3f00]/10 transition-colors rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={isSubmitting || !cartItems || Object.keys(cartItems).length === 0}
+                    >
+                        Empty Cart
+                    </button>
                 </div>
             </div>
 
@@ -326,10 +349,10 @@ const Cart = () => {
                         <h3 className="text-xl font-bold text-[#7c3f00] mb-4">Place Your Order</h3>
                         
                         <div className="space-y-4">
-                            {/* Table Number */}
+                            {/* Table Number (optional) */}
                             <div>
                                 <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
-                                    Table Number *
+                                    Table Number
                                 </label>
                                 <input
                                     type="number"
@@ -339,23 +362,55 @@ const Cart = () => {
                                     className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
                                     min="1"
                                     max="50"
-                                    required
+                                    
                                 />
                             </div>
 
                             {/* Customer Name */}
                             <div>
                                 <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
-                                    Customer Name
+                                    Customer Name *
                                 </label>
                                 <input
                                     type="text"
                                     value={customerName}
                                     onChange={(e) => setCustomerName(e.target.value)}
-                                    placeholder="Enter your name (optional)"
+                                    placeholder="Enter your name"
                                     className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
+                                    required
                                 />
                                 </div>
+
+                            {/* Phone Number */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                    Phone Number *
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    placeholder="Enter your phone number"
+                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
+                                    required
+                                />
+                            </div>
+
+                            {/* Address */}
+                            <div>
+                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                    Address *
+                                </label>
+                                <textarea
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    placeholder="Enter your address"
+                                    rows="2"
+                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20 resize-none"
+                                    required
+                                />
+                            </div>
+
                                 
                             {/* Order Type */}
                             <div>
@@ -409,10 +464,12 @@ const Cart = () => {
                             <button
                                 onClick={submitOrder}
                                 className="flex-1 py-2 px-4 bg-[#7c3f00] text-white rounded-lg hover:bg-[#a0522d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={isSubmitting || !tableNumber}
+                                disabled={isSubmitting || !customerName?.trim() || !phone?.trim() || !address?.trim()}
                             >
                                 {isSubmitting ? 'Placing Order...' : 'Confirm Order'}
                             </button>
+
+
                         </div>
                     </div>
                 </div>

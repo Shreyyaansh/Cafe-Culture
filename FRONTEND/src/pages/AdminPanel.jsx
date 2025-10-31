@@ -8,7 +8,7 @@ const AdminPanel = () => {
     const location = useLocation();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all'); // all, pending, preparing, ready, completed
+    const [filter, setFilter] = useState('all');
     const [stats, setStats] = useState({
         totalOrders: 0,
         totalRevenue: 0,
@@ -98,10 +98,7 @@ const AdminPanel = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'preparing': return 'bg-blue-100 text-blue-800';
-            case 'ready': return 'bg-green-100 text-green-800';
             case 'completed': return 'bg-gray-100 text-gray-800';
-            case 'cancelled': return 'bg-red-100 text-red-800';
             default: return 'bg-gray-100 text-gray-800';
         }
     };
@@ -183,16 +180,16 @@ const AdminPanel = () => {
                         </p>
                     </div>
                     <div className="bg-[#faf0e6] p-6 rounded-lg border border-[#7c3f00]/10">
-                        <h3 className="text-lg font-semibold text-[#7c3f00] mb-2">Ready Orders</h3>
+                        <h3 className="text-lg font-semibold text-[#7c3f00] mb-2">Completed Orders</h3>
                         <p className="text-3xl font-bold text-[#7c3f00]">
-                            {stats.statusBreakdown.find(s => s._id === 'ready')?.count || 0}
+                            {stats.statusBreakdown.find(s => s._id === 'completed')?.count || 0}
                         </p>
                     </div>
                 </div>
 
-                {/* Filter Buttons */}
+                {/* Minimal Filters */}
                 <div className="flex flex-wrap gap-3 mb-6">
-                    {['all', 'pending', 'preparing', 'ready', 'completed'].map((status) => (
+                    {['all', 'pending', 'completed'].map((status) => (
                         <button
                             key={status}
                             onClick={() => setFilter(status)}
@@ -202,8 +199,7 @@ const AdminPanel = () => {
                                     : 'bg-[#faf0e6] text-[#7c3f00] hover:bg-[#7c3f00]/10'
                             }`}
                         >
-                            {status.charAt(0).toUpperCase() + status.slice(1)} 
-                            ({status === 'all' ? orders.length : orders.filter(o => o.status === status).length})
+                            {status.charAt(0).toUpperCase() + status.slice(1)}
                         </button>
                     ))}
                 </div>
@@ -215,10 +211,7 @@ const AdminPanel = () => {
                             <div className="text-6xl mb-4">📋</div>
                             <h3 className="text-xl font-semibold text-[#7c3f00] mb-2">No orders found</h3>
                             <p className="text-[#7c3f00]/70">
-                                {filter === 'all' 
-                                    ? 'No orders have been placed yet.' 
-                                    : `No orders with status "${filter}" found.`
-                                }
+                                No orders have been placed yet.
                             </p>
                         </div>
                     ) : (
@@ -228,13 +221,23 @@ const AdminPanel = () => {
                                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                                     <div>
                                         <h3 className="text-xl font-bold text-[#7c3f00]">
-                                            Table {order.tableNumber} - Order #{order._id.slice(-6)}
+                                            Table {order.tableNumber || 'N/A'} - Order #{order._id.slice(-6)}
                                         </h3>
                                         <p className="text-[#7c3f00]/70">
                                             Customer: {order.customerName} | 
+                                            Phone: {order.phone} | 
                                             Type: {order.orderType} | 
                                             Time: {formatTime(order.orderTime)}
                                         </p>
+                                        {order.address && (
+                                            <p className="text-[#7c3f00]/70 truncate">Address: {order.address}</p>
+                                        )}
+                                        <p className="text-[#7c3f00]/70 mt-1">
+                                            Email: {order.emailSent ? 'Sent' : 'Not Sent'}
+                                        </p>
+                                        {!order.emailSent && order.emailError && (
+                                            <p className="text-[#7c3f00]/60 text-xs mt-0.5">{order.emailError}</p>
+                                        )}
                                     </div>
                                     <div className="flex items-center gap-3 mt-2 md:mt-0">
                                         <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
@@ -272,45 +275,21 @@ const AdminPanel = () => {
                                     </div>
                                 )}
 
-                                {/* Action Buttons */}
+                                {/* Action Buttons (Simplified) */}
                                 <div className="flex flex-wrap gap-3">
-                                    {order.status === 'pending' && (
-                                        <button
-                                            onClick={() => updateOrderStatus(order._id, 'preparing')}
-                                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                                        >
-                                            Start Preparing
-                                        </button>
-                                    )}
-                                    {order.status === 'preparing' && (
-                                        <button
-                                            onClick={() => updateOrderStatus(order._id, 'ready')}
-                                            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                                        >
-                                            Mark as Ready
-                                        </button>
-                                    )}
-                                    {order.status === 'ready' && (
+                                    {order.status !== 'completed' && (
                                         <button
                                             onClick={() => updateOrderStatus(order._id, 'completed')}
-                                            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                                         >
-                                            Mark as Completed
-                                        </button>
-                                    )}
-                                    {order.status === 'pending' && (
-                                        <button
-                                            onClick={() => updateOrderStatus(order._id, 'cancelled')}
-                                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                                        >
-                                            Cancel Order
+                                            Complete Order
                                         </button>
                                     )}
                                     <button
                                         onClick={() => deleteOrder(order._id)}
                                         className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
                                     >
-                                        Delete
+                                        Delete Order
                                     </button>
                                 </div>
                             </div>

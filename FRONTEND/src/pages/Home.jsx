@@ -4,6 +4,7 @@ import Categories from '../components/Categories'
 import OurStory from '../components/OurStory'
 import WhatsNew from '../components/WhatsNew'
 import ContactInfo from '../components/ContactInfo'
+import Reviews from '../components/Reviews'
 
 const Home = () => {
   return (
@@ -20,6 +21,7 @@ const Home = () => {
       </div>
       <div id="contact-section">
         <ContactInfo/>
+        <Reviews/>
       </div>
     </div>
   )

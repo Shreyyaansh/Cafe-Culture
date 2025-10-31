@@ -2,13 +2,20 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-dotenv.config(); // Load environment variables from .env file
+
+// Resolve .env path relative to this file and load it explicitly
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const envPath = path.join(__dirname, '.env');
+dotenv.config({ path: envPath });
 
 
 await connectDB();
