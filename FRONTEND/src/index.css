@@ -9,3 +9,48 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Custom scrollbar for category bar - visible on desktop, hidden on mobile */
+.category-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #7c3f00 #faf0e6;
+}
+
+.category-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.category-scrollbar::-webkit-scrollbar-track {
+  background: #faf0e6;
+  border-radius: 10px;
+}
+
+.category-scrollbar::-webkit-scrollbar-thumb {
+  background: #7c3f00;
+  border-radius: 10px;
+}
+
+.category-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a0522d;
+}
+
+/* Hide scrollbar on mobile devices */
+@media (max-width: 768px) {
+  .category-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .category-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .auto-scroll {
+    animation: none; /* Disable auto-scroll on mobile */
+  }
+}
