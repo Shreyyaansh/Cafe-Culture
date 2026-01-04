@@ -8,10 +8,26 @@ export const createOrder = async (req, res) => {
         const { tableNumber, customerName, phone, address, items, totalAmount, orderType, specialInstructions } = req.body;
 
         // Validate required fields
-        if (!customerName || !phone || !address || !items || !totalAmount) {
+        if (!customerName || !phone || !items || !totalAmount) {
             return res.status(400).json({
                 success: false,
-                message: "Customer name, phone, address, items, and total amount are required"
+                message: "Customer name, phone, items, and total amount are required"
+            });
+        }
+
+        // Validate address for takeaway orders
+        if (orderType === 'takeaway' && !address) {
+            return res.status(400).json({
+                success: false,
+                message: "Address is required for takeaway orders"
+            });
+        }
+
+        // Validate table number for dine-in orders
+        if (orderType === 'dine-in' && !tableNumber) {
+            return res.status(400).json({
+                success: false,
+                message: "Table number is required for dine-in orders"
             });
         }
 

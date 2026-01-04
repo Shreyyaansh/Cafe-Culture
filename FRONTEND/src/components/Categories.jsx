@@ -65,17 +65,13 @@ const Categories = () => {
           {foodCategories.map((category, index) => (
             <div
               key={index}
-              className='group cursor-pointer py-8 px-6 gap-4 rounded-xl flex flex-col justify-center items-center transition-all transform hover:scale-105 hover:shadow-lg border border-[#7c3f00]/10 bg-white'
-              onClick={() => {
-                navigate('/menu');
-                window.scrollTo(0,0);
-              }}
+              className='group py-8 px-6 gap-4 rounded-xl flex flex-col justify-center items-center transition-all transform hover:scale-105 hover:shadow-lg border border-[#7c3f00]/10 bg-white'
             >
               <div className='text-5xl mb-4 group-hover:scale-110 transition-transform'>
                 {category.icon}
               </div>
               <h3 className='text-lg font-bold text-[#7c3f00] text-center leading-tight mb-2'>
-                {category.name} ({category.count})
+                {category.name}
               </h3>
               <p className='text-sm text-[#7c3f00]/80 text-center leading-relaxed'>
                 {category.description}
@@ -87,7 +83,10 @@ const Categories = () => {
         {/* View Full Menu Button */}
         <div className='text-center'>
           <button
-            onClick={() => navigate('/menu')}
+            onClick={() => {
+              navigate('/menu');
+              window.scrollTo(0, 0);
+            }}
             className='px-8 py-3 bg-[#7c3f00] hover:bg-[#a0522d] text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/50'
           >
             View Full Menu

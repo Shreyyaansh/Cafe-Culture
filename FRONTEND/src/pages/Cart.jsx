@@ -89,8 +89,20 @@ const Cart = () => {
 
     // Submit order to database
     const submitOrder = async () => {
-        if (!customerName?.trim() || !phone?.trim() || !address?.trim()) {
-            toast.error("Please fill customer name, phone number, and address");
+        if (!customerName?.trim() || !phone?.trim()) {
+            toast.error("Please fill customer name and phone number");
+            return;
+        }
+
+        // Validate table number for dine-in orders
+        if (orderType === 'dine-in' && !tableNumber?.trim()) {
+            toast.error("Please enter a table number for dine-in orders");
+            return;
+        }
+
+        // Validate address for takeaway orders
+        if (orderType === 'takeaway' && !address?.trim()) {
+            toast.error("Please enter an address for takeaway orders");
             return;
         }
 
@@ -103,10 +115,10 @@ const Cart = () => {
 
         try {
             const orderData = {
-                ...(tableNumber ? { tableNumber: parseInt(tableNumber) } : {}),
+                ...(orderType === 'dine-in' && tableNumber ? { tableNumber: parseInt(tableNumber) } : {}),
                 customerName: customerName,
                 phone: phone,
-                address: address,
+                address: orderType === 'takeaway' ? address : 'N/A', // Send 'N/A' for dine-in orders
                 items: cartArray.map(item => ({
                     name: item.name,
                     price: item.offerPrice,
@@ -349,22 +361,45 @@ const Cart = () => {
                         <h3 className="text-xl font-bold text-[#7c3f00] mb-4">Place Your Order</h3>
                         
                         <div className="space-y-4">
-                            {/* Table Number (optional) */}
+                            {/* Order Type - Moved to top */}
                             <div>
                                 <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
-                                    Table Number
+                                    Order Type *
                                 </label>
-                                <input
-                                    type="number"
-                                    value={tableNumber}
-                                    onChange={(e) => setTableNumber(e.target.value)}
-                                    placeholder="Enter table number"
+                                <select
+                                    value={orderType}
+                                    onChange={(e) => {
+                                        setOrderType(e.target.value);
+                                        // Clear table number when switching to takeaway
+                                        if (e.target.value === 'takeaway') {
+                                            setTableNumber('');
+                                        }
+                                    }}
                                     className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
-                                    min="1"
-                                    max="50"
-                                    
-                                />
+                                >
+                                    <option value="dine-in">Dine In</option>
+                                    <option value="takeaway">Takeaway</option>
+                                </select>
                             </div>
+
+                            {/* Table Number - Only show for dine-in */}
+                            {orderType === 'dine-in' && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                        Table Number *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={tableNumber}
+                                        onChange={(e) => setTableNumber(e.target.value)}
+                                        placeholder="Enter table number"
+                                        className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
+                                        min="1"
+                                        max="50"
+                                        required
+                                    />
+                                </div>
+                            )}
 
                             {/* Customer Name */}
                             <div>
@@ -379,7 +414,7 @@ const Cart = () => {
                                     className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
                                     required
                                 />
-                                </div>
+                            </div>
 
                             {/* Phone Number */}
                             <div>
@@ -396,36 +431,22 @@ const Cart = () => {
                                 />
                             </div>
 
-                            {/* Address */}
-                            <div>
-                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
-                                    Address *
-                                </label>
-                                <textarea
-                                    value={address}
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    placeholder="Enter your address"
-                                    rows="2"
-                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20 resize-none"
-                                    required
-                                />
-                            </div>
-
-                                
-                            {/* Order Type */}
-                            <div>
-                                <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
-                                    Order Type
-                                </label>
-                                <select
-                                    value={orderType}
-                                    onChange={(e) => setOrderType(e.target.value)}
-                                    className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20"
-                                >
-                                    <option value="dine-in">Dine In</option>
-                                    <option value="takeaway">Takeaway</option>
-                                </select>
+                            {/* Address - Only show for takeaway */}
+                            {orderType === 'takeaway' && (
+                                <div>
+                                    <label className="block text-sm font-semibold text-[#7c3f00] mb-2">
+                                        Address *
+                                    </label>
+                                    <textarea
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        placeholder="Enter your address"
+                                        rows="2"
+                                        className="w-full border border-[#7c3f00]/20 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7c3f00]/20 resize-none"
+                                        required
+                                    />
                                 </div>
+                            )}
                                 
                             {/* Special Instructions */}
                                 <div>
@@ -447,7 +468,10 @@ const Cart = () => {
                                 <div className="space-y-1 text-sm">
                                     <p>Items: {getCartCount()}</p>
                                     <p>Total: {currency}{getCartAmount()}</p>
-                                    <p>Table: {tableNumber || 'Not specified'}</p>
+                                    <p>Order Type: <span className="capitalize">{orderType === 'dine-in' ? 'Dine In' : 'Takeaway'}</span></p>
+                                    {orderType === 'dine-in' && (
+                                        <p>Table: {tableNumber || 'Not specified'}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -464,7 +488,7 @@ const Cart = () => {
                             <button
                                 onClick={submitOrder}
                                 className="flex-1 py-2 px-4 bg-[#7c3f00] text-white rounded-lg hover:bg-[#a0522d] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={isSubmitting || !customerName?.trim() || !phone?.trim() || !address?.trim()}
+                                disabled={isSubmitting || !customerName?.trim() || !phone?.trim() || (orderType === 'dine-in' && !tableNumber?.trim()) || (orderType === 'takeaway' && !address?.trim())}
                             >
                                 {isSubmitting ? 'Placing Order...' : 'Confirm Order'}
                             </button>

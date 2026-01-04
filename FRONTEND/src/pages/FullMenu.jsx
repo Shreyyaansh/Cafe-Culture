@@ -29,7 +29,7 @@ const FullMenu = () => {
     ],
     'hot-chocolates': [
       { name: 'Hot Chocolate', price: '₹189', image: '🍫', description: 'Premium cocoa rich hot chocolate. 250 ML' },
-      { name: 'Hazelnut / Vanilla Add-On', price: '₹19', image: '🍫', description: 'Flavour enhancement shot. 20 ML' }
+      { name: 'Hazelnut / Vanilla Add-On', price: '₹19', image: '🍫', description: 'Flavour enhancement shot. 20 ML For Hot chocolate' }
     ],
     'iced-coffee': [
       { name: 'Iced Americano', price: '₹159', image: '🧊', description: 'Iced black americano. 250 ML' },
@@ -229,6 +229,15 @@ const FullMenu = () => {
     { key: 'bowls', name: 'Bowls', icon: '🥗', count: menuItems.bowls.length },
     { key: 'desserts', name: 'Desserts', icon: '🍰', count: menuItems.desserts.length }
   ];
+
+  // Function to stop auto-scroll permanently
+  const stopAutoScroll = () => {
+    if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current);
+      autoScrollRef.current = null;
+    }
+    isPausedRef.current = true;
+  };
 
   // Auto-scroll effect
   useEffect(() => {
@@ -456,7 +465,10 @@ const FullMenu = () => {
             {specificCategories.map((category) => (
               <button
                 key={category.key}
-                onClick={() => setActiveCategory(category.key)}
+                onClick={() => {
+                  stopAutoScroll(); // Stop auto-scroll when any category button is clicked
+                  setActiveCategory(category.key);
+                }}
                 className={`px-3 py-2 sm:px-4 rounded-full font-semibold transition-all flex items-center gap-1 sm:gap-2 text-sm sm:text-base whitespace-nowrap flex-shrink-0 ${
                   activeCategory === category.key
                     ? 'bg-[#7c3f00] text-white shadow-lg'
@@ -511,13 +523,6 @@ const FullMenu = () => {
           </div>
         )}
 
-        {/* Add Ons Section */}
-        {(activeCategory === 'hot-coffees' || activeCategory === 'hot-chocolates' || activeCategory === 'all') && (
-          <div className='mt-12 bg-[#faf0e6] rounded-xl p-6'>
-            <h3 className='text-xl font-bold text-[#7c3f00] mb-4'>Add Ons</h3>
-            <p className='text-[#7c3f00]'>Hazelnut / Vanilla Add-On: ₹19 (Flavour enhancement shot. 20 ML)</p>
-          </div>
-        )}
       </div>
     </div>
   );
