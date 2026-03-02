@@ -146,9 +146,9 @@ const menuItemsFromFullMenu = {
     { name: 'Paneer Tikka Burger', price: '₹159', description: 'Tandoori paneer patty.' }
   ],
   'garlic-bread': [
-    { name: 'Classic', price: '₹139', description: 'Garlic buttery toast.' },
-    { name: 'Chilli Cheese', price: '₹149', description: 'Cheesy & spicy.' },
-    { name: 'Cheese Corn', price: '₹159', description: 'Corn & cheese loaded.' }
+    { name: 'Classic Garlic Bread', price: '₹139', description: 'Garlic buttery toast.' },
+    { name: 'Chilli Cheese Garlic Bread', price: '₹149', description: 'Cheesy & spicy.' },
+    { name: 'Cheese Corn Garlic Bread', price: '₹159', description: 'Corn & cheese loaded.' }
   ],
   pizza: [
     { name: 'Full Cheese Bliss', price: '₹219', description: 'Loaded mozzarella.' },

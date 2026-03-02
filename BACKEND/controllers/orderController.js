@@ -91,7 +91,7 @@ export const createOrder = async (req, res) => {
                 <div style="font-family:Arial, sans-serif;color:#333;">
                   <h2>New Order Placed</h2>
                   <p><strong>Order ID:</strong> ${order._id}</p>
-                  <p><strong>Time:</strong> ${new Date(order.orderTime).toLocaleString()}</p>
+                  <p><strong>Time:</strong> ${new Date(order.orderTime).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>
                   <p><strong>Customer:</strong> ${order.customerName}</p>
                   <p><strong>Phone:</strong> ${order.phone}</p>
                   <p><strong>Address:</strong> ${order.address}</p>

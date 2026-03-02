@@ -326,9 +326,9 @@ export const menuImageMapping = {
   'Paneer Tikka Burger': paneerTikkaBurgerImage,
   
   // ========== GARLIC BREAD ==========
-  'Classic': classicGarlicBreadImage,
-  'Chilli Cheese': chilliCheeseGarlicBreadImage,
-  'Cheese Corn': cheeseCornGarlicBreadImage,
+  'Classic Garlic Bread': classicGarlicBreadImage,
+  'Chilli Cheese Garlic Bread': chilliCheeseGarlicBreadImage,
+  'Cheese Corn Garlic Bread': cheeseCornGarlicBreadImage,
   
   // ========== PIZZA ==========
   'Full Cheese Bliss': fullCheeseBlissImage,

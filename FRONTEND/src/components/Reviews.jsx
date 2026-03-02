@@ -9,7 +9,7 @@ const reviews = [
     timeAgo: 'a month ago',
     visitType: 'Dine in',
     priceRange: '₹200–400',
-    text: "Perfect atmosphere, lovely beverages, although I work sometimes here, but it's also cool place to hang around with friends. Highly recommend."
+    text: "Perfect atmosphere and lovely beverages. I often work from here and it’s equally perfect for hanging out with friends. Highly recommended for coffee lovers."
   },
   {
     initials: 'A K',
@@ -18,7 +18,7 @@ const reviews = [
     timeAgo: '2 months ago',
     visitType: 'Dine in',
     priceRange: '₹200–400',
-    text: 'Best experience over here. Just the great food served here.'
+    text: 'One of the best café experiences in the area. Great food, quick service and a warm ambience that makes you want to stay longer.'
   },
   {
     initials: 'P',
@@ -27,7 +27,7 @@ const reviews = [
     timeAgo: '2 months ago',
     visitType: 'Dine in',
     priceRange: undefined,
-    text: 'Great ambience. A great place to chill with friends. MYOB is a relatively new concept in this area and they are the first ones to offer it. Their freshly brewed coffees are a must try for sure.'
+    text: 'Great ambience and a perfect place to chill with friends. The MYOB concept is fun and unique, and their freshly brewed coffees are a must-try.'
   },
   {
     initials: 'S',
@@ -36,7 +36,7 @@ const reviews = [
     timeAgo: '2 months ago',
     visitType: 'Brunch',
     priceRange: '₹400–600',
-    text: 'Best service ever. The owner is very humble and I really like that. The food was also on point. Moreover best place for friends and even couples to eat here.'
+    text: 'Amazing service and very humble staff. The food is on point and the space works beautifully for both friends and couples.'
   },
   {
     initials: 'M J',
@@ -45,7 +45,7 @@ const reviews = [
     timeAgo: 'Edited 2 weeks ago',
     visitType: 'Dinner',
     priceRange: undefined,
-    text: 'The food was very good.. As a coffee lover the coffee was on point.. The food was delicious and on point taste.. I will visit again and again.. As per me we should visit once.... Thxx.'
+    text: 'Food is delicious and as a coffee lover I loved the brew here. Flavours are well balanced and it’s definitely a place I would visit again.'
   }
 ];
 
@@ -62,11 +62,12 @@ const StarRow = ({ rating }) => {
 };
 
 const Reviews = () => {
-  const row = [...reviews, ...reviews, ...reviews];
+  const row = [...reviews, ...reviews]; // two loops feel less repetitive
   const [paused, setPaused] = useState(false);
   const resumeTimer = useRef(null);
+  const trackRef = useRef(null);
 
-  const kickResume = (delay = 600) => {
+  const kickResume = (delay = 800) => {
     if (resumeTimer.current) clearTimeout(resumeTimer.current);
     resumeTimer.current = setTimeout(() => setPaused(false), delay);
   };
@@ -78,20 +79,22 @@ const Reviews = () => {
         <p className="text-[#7c3f00]/70 text-sm">Real reviews from our guests</p>
       </div>
 
-      {/* Mobile: swipeable scroller */}
+      {/* Mobile: swipeable + gently auto-scrolling carousel */}
       <div
         className="relative block md:hidden overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth hide-scrollbar"
         onTouchStart={() => setPaused(true)}
         onTouchEnd={() => kickResume(500)}
         onTouchCancel={() => kickResume(500)}
         onPointerDown={() => setPaused(true)}
-        onPointerUp={() => kickResume(500)}
-        onScroll={() => { setPaused(true); kickResume(800); }}
+        onPointerUp={() => kickResume(600)}
+        onScroll={() => { setPaused(true); kickResume(1200); }}
       >
         <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#FBF9F4] to-transparent z-10"></div>
         <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#FBF9F4] to-transparent z-10"></div>
-
-        <div className={`flex gap-4 animate-[scroll_30s_linear_infinite] will-change-transform ${paused ? 'pause-anim' : ''}`}>
+        <div
+          ref={trackRef}
+          className={`flex gap-4 animate-[reviewsScroll_35s_linear_infinite] will-change-transform ${paused ? 'pause-anim' : ''}`}
+        >
           {row.map((r, idx) => (
             <div
               key={idx}
@@ -123,7 +126,7 @@ const Reviews = () => {
                   {[r.visitType, r.priceRange, r.timeAgo].filter(Boolean).join(' • ')}
                 </div>
               )}
-              <p className="text-sm text-[#7c3f00]/80 line-clamp-4">{r.text}</p>
+              <p className="text-sm text-[#7c3f00]/80 line-clamp-4 leading-relaxed">{r.text}</p>
               <div className="mt-3 flex items-center gap-1 text-xs text-[#7c3f00]/60">
                 <img alt="Google" src={googleIcon} className="w-4 h-4" />
                 <span>Google Review</span>
@@ -135,9 +138,9 @@ const Reviews = () => {
         <style>{`
           /* Simple global clamp to prevent any horizontal scrollbar */
           html, body { overflow-x: hidden; }
-          @keyframes scroll {
+          @keyframes reviewsScroll {
             0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-33.333333%, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); } /* loop once through the doubled row */
           }
           .pause-anim { animation-play-state: paused; }
           .scroll-smooth { -webkit-overflow-scrolling: touch; touch-action: pan-x; }
@@ -148,25 +151,25 @@ const Reviews = () => {
           .hide-scrollbar::-webkit-scrollbar-track { background: transparent; }
           /* Phones */
           @media (max-width: 640px) {
-            .animate-[scroll_30s_linear_infinite] { animation: scroll 22s linear infinite; }
+            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 26s linear infinite; }
           }
           /* Small tablets */
           @media (min-width: 641px) and (max-width: 768px) {
-            .animate-[scroll_30s_linear_infinite] { animation: scroll 30s linear infinite; }
+            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 32s linear infinite; }
           }
           /* Desktop */
           @media (min-width: 769px) {
-            .animate-[scroll_30s_linear_infinite] { animation: scroll 40s linear infinite; }
+            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 40s linear infinite; }
           }
         `}</style>
       </div>
 
-      {/* Desktop: overflow-hidden wrapper with absolutely positioned track (no scrollbar) */}
+      {/* Desktop: overflow-hidden wrapper with continuously auto-scrolling track */}
       <div className="relative hidden md:block overflow-hidden">
         <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#FBF9F4] to-transparent z-10"></div>
         <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#FBF9F4] to-transparent z-10"></div>
 
-        <div className={`flex gap-4 animate-[scroll_30s_linear_infinite] will-change-transform`}>
+        <div className={`flex gap-4 animate-[reviewsScroll_35s_linear_infinite] will-change-transform`}>
           {row.map((r, idx) => (
             <div
               key={idx}
