@@ -340,15 +340,7 @@ export const getOrdersByTable = async (req, res) => {
 // Get order statistics
 export const getOrderStats = async (req, res) => {
     try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
         const stats = await Order.aggregate([
-            {
-                $match: {
-                    orderTime: { $gte: today }
-                }
-            },
             {
                 $group: {
                     _id: "$status",
@@ -358,14 +350,12 @@ export const getOrderStats = async (req, res) => {
             }
         ]);
 
-        const totalOrders = await Order.countDocuments({
-            orderTime: { $gte: today }
-        });
+        // Total orders across all time
+        const totalOrders = await Order.countDocuments({});
 
         const totalRevenue = await Order.aggregate([
             {
                 $match: {
-                    orderTime: { $gte: today },
                     status: { $in: ['completed', 'ready'] }
                 }
             },

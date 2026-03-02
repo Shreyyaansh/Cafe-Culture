@@ -170,7 +170,7 @@ const AdminPanel = () => {
                         <p className="text-3xl font-bold text-[#7c3f00]">{stats.totalOrders}</p>
                     </div>
                     <div className="bg-[#faf0e6] p-6 rounded-lg border border-[#7c3f00]/10">
-                        <h3 className="text-lg font-semibold text-[#7c3f00] mb-2">Today's Revenue</h3>
+                        <h3 className="text-lg font-semibold text-[#7c3f00] mb-2">Revenue</h3>
                         <p className="text-3xl font-bold text-[#7c3f00]">₹{stats.totalRevenue}</p>
                     </div>
                     <div className="bg-[#faf0e6] p-6 rounded-lg border border-[#7c3f00]/10">
