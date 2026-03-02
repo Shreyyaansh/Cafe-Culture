@@ -89,8 +89,6 @@ const Reviews = () => {
         onPointerUp={() => kickResume(600)}
         onScroll={() => { setPaused(true); kickResume(1200); }}
       >
-        <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-[#FBF9F4] to-transparent z-10"></div>
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#FBF9F4] to-transparent z-10"></div>
         <div
           ref={trackRef}
           className={`flex gap-4 animate-[reviewsScroll_35s_linear_infinite] will-change-transform ${paused ? 'pause-anim' : ''}`}

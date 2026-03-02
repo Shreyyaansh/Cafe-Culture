@@ -239,13 +239,10 @@ const FullMenu = () => {
     isPausedRef.current = true;
   };
 
-  // Auto-scroll effect (disabled on iOS where it can conflict with touch physics)
+  // Auto-scroll effect for category bar (pauses on hover/touch)
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-
-    const isIOS = /iPad|iPhone|iPod/.test(window.navigator.userAgent);
-    if (isIOS) return; // rely on native swipe on iOS only
 
     const scroll = () => {
       if (isPausedRef.current) return;
