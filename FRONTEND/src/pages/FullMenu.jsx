@@ -7,7 +7,8 @@ const FullMenu = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { addToCart, removeFromCart, cartItems } = UseAppContext();
   const scrollContainerRef = useRef(null);
-  const autoScrollRef = useRef(null);
+  const isPausedRef = useRef(false);
+  const isAutoScrollStoppedRef = useRef(false);
 
   const menuItems = {
     'hot-coffees': [
@@ -231,35 +232,36 @@ const FullMenu = () => {
 
   // Function to stop auto-scroll permanently
   const stopAutoScroll = () => {
-    if (autoScrollRef.current) {
-      clearInterval(autoScrollRef.current);
-      autoScrollRef.current = null;
-    }
+    isAutoScrollStoppedRef.current = true;
+    isPausedRef.current = true;
   };
 
-  // Auto-scroll effect for category bar (all devices, stops permanently after a category click)
+  // Auto-scroll effect for category bar (all devices, pauses on hover/touch, stops after click)
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
+    let frameId;
+
     const step = () => {
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      if (maxScroll > 0) {
-        if (container.scrollLeft >= maxScroll - 1) {
-          container.scrollLeft = 0;
-        } else {
-          container.scrollLeft += 0.45;
+      if (!container) return;
+      if (!isPausedRef.current && !isAutoScrollStoppedRef.current) {
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        if (maxScroll > 0) {
+          if (container.scrollLeft >= maxScroll - 1) {
+            container.scrollLeft = 0;
+          } else {
+            container.scrollLeft += 1.2; // faster so movement is clearly visible on mobile/iOS
+          }
         }
       }
+      frameId = window.requestAnimationFrame(step);
     };
 
-    autoScrollRef.current = setInterval(step, 16); // ~60fps
+    frameId = window.requestAnimationFrame(step);
 
     return () => {
-      if (autoScrollRef.current) {
-        clearInterval(autoScrollRef.current);
-        autoScrollRef.current = null;
-      }
+      if (frameId) window.cancelAnimationFrame(frameId);
     };
   }, []);
 
@@ -436,6 +438,34 @@ const FullMenu = () => {
               if (e.deltaY !== 0) {
                 e.preventDefault();
                 e.currentTarget.scrollLeft += e.deltaY;
+              }
+            }}
+            onMouseEnter={() => {
+              // Pause auto-scroll on hover (desktop)
+              if (!isAutoScrollStoppedRef.current) {
+                isPausedRef.current = true;
+              }
+            }}
+            onMouseLeave={() => {
+              // Resume auto-scroll when not hovering
+              if (!isAutoScrollStoppedRef.current) {
+                isPausedRef.current = false;
+              }
+            }}
+            onTouchStart={() => {
+              // Pause auto-scroll on touch (mobile)
+              if (!isAutoScrollStoppedRef.current) {
+                isPausedRef.current = true;
+              }
+            }}
+            onTouchEnd={() => {
+              // Ensure auto-scroll resumes shortly after touch on all mobile browsers (including iOS)
+              if (!isAutoScrollStoppedRef.current) {
+                setTimeout(() => {
+                  if (!isAutoScrollStoppedRef.current) {
+                    isPausedRef.current = false;
+                  }
+                }, 1200);
               }
             }}
           >
