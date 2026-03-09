@@ -8,8 +8,6 @@ const FullMenu = () => {
   const { addToCart, removeFromCart, cartItems } = UseAppContext();
   const scrollContainerRef = useRef(null);
   const autoScrollRef = useRef(null);
-  const isPausedRef = useRef(false);
-  const isAutoScrollStoppedRef = useRef(false);
 
   const menuItems = {
     'hot-coffees': [
@@ -233,36 +231,35 @@ const FullMenu = () => {
 
   // Function to stop auto-scroll permanently
   const stopAutoScroll = () => {
-    isAutoScrollStoppedRef.current = true;
-    isPausedRef.current = true;
+    if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current);
+      autoScrollRef.current = null;
+    }
   };
 
-  // Auto-scroll effect for category bar (pauses on hover/touch)
+  // Auto-scroll effect for category bar (all devices, stops permanently after a category click)
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    let frameId;
-
     const step = () => {
-      if (!container) return;
-      if (!isPausedRef.current && !isAutoScrollStoppedRef.current) {
-        const maxScroll = container.scrollWidth - container.clientWidth;
-        if (maxScroll > 0) {
-          if (container.scrollLeft >= maxScroll - 1) {
-            container.scrollLeft = 0;
-          } else {
-            container.scrollLeft += 0.45;
-          }
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      if (maxScroll > 0) {
+        if (container.scrollLeft >= maxScroll - 1) {
+          container.scrollLeft = 0;
+        } else {
+          container.scrollLeft += 0.45;
         }
       }
-      frameId = requestAnimationFrame(step);
     };
 
-    frameId = requestAnimationFrame(step);
+    autoScrollRef.current = setInterval(step, 16); // ~60fps
 
     return () => {
-      if (frameId) cancelAnimationFrame(frameId);
+      if (autoScrollRef.current) {
+        clearInterval(autoScrollRef.current);
+        autoScrollRef.current = null;
+      }
     };
   }, []);
 
@@ -440,24 +437,6 @@ const FullMenu = () => {
                 e.preventDefault();
                 e.currentTarget.scrollLeft += e.deltaY;
               }
-            }}
-            onMouseEnter={() => {
-              // Pause auto-scroll on hover
-              isPausedRef.current = true;
-            }}
-            onMouseLeave={() => {
-              // Resume auto-scroll when not hovering
-              isPausedRef.current = false;
-            }}
-            onTouchStart={() => {
-              // Pause auto-scroll on touch (mobile)
-              isPausedRef.current = true;
-            }}
-            onTouchEnd={() => {
-              // Ensure auto-scroll resumes shortly after touch on all mobile browsers (including iOS)
-              setTimeout(() => {
-                isPausedRef.current = false;
-              }, 1200);
             }}
           >
             {specificCategories.map((category) => (
