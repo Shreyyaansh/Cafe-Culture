@@ -9,6 +9,7 @@ const FullMenu = () => {
   const scrollContainerRef = useRef(null);
   const autoScrollRef = useRef(null);
   const isPausedRef = useRef(false);
+  const isAutoScrollStoppedRef = useRef(false);
 
   const menuItems = {
     'hot-coffees': [
@@ -232,10 +233,7 @@ const FullMenu = () => {
 
   // Function to stop auto-scroll permanently
   const stopAutoScroll = () => {
-    if (autoScrollRef.current) {
-      clearInterval(autoScrollRef.current);
-      autoScrollRef.current = null;
-    }
+    isAutoScrollStoppedRef.current = true;
     isPausedRef.current = true;
   };
 
@@ -248,13 +246,13 @@ const FullMenu = () => {
 
     const step = () => {
       if (!container) return;
-      if (!isPausedRef.current) {
+      if (!isPausedRef.current && !isAutoScrollStoppedRef.current) {
         const maxScroll = container.scrollWidth - container.clientWidth;
         if (maxScroll > 0) {
           if (container.scrollLeft >= maxScroll - 1) {
             container.scrollLeft = 0;
           } else {
-            container.scrollLeft += 1.2; // faster so movement is clearly visible on mobile/iOS
+            container.scrollLeft += 0.45;
           }
         }
       }
