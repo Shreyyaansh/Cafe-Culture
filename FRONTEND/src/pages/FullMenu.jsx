@@ -254,7 +254,7 @@ const FullMenu = () => {
           if (container.scrollLeft >= maxScroll - 1) {
             container.scrollLeft = 0;
           } else {
-            container.scrollLeft += 0.6; // slightly faster for mobile, smooth on all devices
+            container.scrollLeft += 1.2; // faster so movement is clearly visible on mobile/iOS
           }
         }
       }
@@ -456,10 +456,10 @@ const FullMenu = () => {
               isPausedRef.current = true;
             }}
             onTouchEnd={() => {
-              // Resume after a delay on mobile
+              // Ensure auto-scroll resumes shortly after touch on all mobile browsers (including iOS)
               setTimeout(() => {
                 isPausedRef.current = false;
-              }, 2000);
+              }, 1200);
             }}
           >
             {specificCategories.map((category) => (
