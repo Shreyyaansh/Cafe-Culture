@@ -149,15 +149,15 @@ const Reviews = () => {
           .hide-scrollbar::-webkit-scrollbar-track { background: transparent; }
           /* Phones */
           @media (max-width: 640px) {
-            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 26s linear infinite; }
+            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 18s linear infinite; }
           }
           /* Small tablets */
           @media (min-width: 641px) and (max-width: 768px) {
-            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 32s linear infinite; }
+            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 26s linear infinite; }
           }
           /* Desktop */
           @media (min-width: 769px) {
-            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 40s linear infinite; }
+            .animate-[reviewsScroll_35s_linear_infinite] { animation: reviewsScroll 36s linear infinite; }
           }
         `}</style>
       </div>

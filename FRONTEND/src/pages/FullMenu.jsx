@@ -60,7 +60,7 @@ const FullMenu = () => {
       { name: 'Cranberry Mojito', price: '₹149', image: '🍹', description: 'Sweet & sour cranberry mojito. 300 ML' },
       { name: 'Strawberry Mint Mojito', price: '₹149', image: '🍹', description: 'Juicy strawberry & mint mix. 300 ML' },
       { name: 'Watermelon Mojito', price: '₹149', image: '🍹', description: 'Cool refreshing watermelon mojito. 300 ML' },
-      { name: 'Curacao Blue', price: '₹149', image: '🍹', description: 'Blue tropical citrus mojito. 300 ML' },
+      { name: 'Curacao Blue Mojito', price: '₹149', image: '🍹', description: 'Blue tropical citrus mojito. 300 ML' },
       { name: 'Red Bull Mojito', price: '₹199', image: '🍹', description: 'Energy infused mocktail. 300 ML' },
       { name: 'Beer Mojito', price: '₹229', image: '🍹', description: 'Beer styled mojito flavour. 300 ML' }
     ],
@@ -69,7 +69,7 @@ const FullMenu = () => {
       { name: 'Caramel Cheesecake Frappe', price: '₹209', image: '🥤', description: 'Caramel rich ice blended frappe. 300 ML' },
       { name: 'Irish Cold Coffee', price: '₹209', image: '🥤', description: 'Smooth Irish flavour iced coffee. 300 ML' },
       { name: 'Biscoff Frappe', price: '₹219', image: '🥤', description: 'Cold coffee with biscuit flavour. 300 ML' },
-      { name: 'Mocha Java Chip', price: '₹219', image: '🥤', description: 'Coffee + choco chip crunch. 300 ML' },
+      { name: 'Mocha Java Chip Frappe', price: '₹219', image: '🥤', description: 'Coffee + choco chip crunch. 300 ML' },
       { name: 'Tiramisu Frappe', price: '₹239', image: '🥤', description: 'Tiramisu inspired cold frappe. 300 ML' },
       { name: 'Nutella Frappe', price: '₹239', image: '🥤', description: 'Nutty rich nutella frappe. 300 ML' },
       { name: 'Brownie Frappe', price: '₹249', image: '🥤', description: 'Thick chocolate brownie blended frappe. 300 ML' }
@@ -87,7 +87,7 @@ const FullMenu = () => {
       { name: 'Full Power Smoothie', price: '₹229', image: '🥤', description: 'Heavy fruit & nut mixture. 300 ML' }
     ],
     'thick-shakes': [
-      { name: 'Classic Vanilla', price: '₹139', image: '🥤', description: 'Smooth vanilla thickshake. 300 ML' },
+      { name: 'Classic Vanilla Shake', price: '₹139', image: '🥤', description: 'Smooth vanilla thickshake. 300 ML' },
       { name: 'Cold Cocoa', price: '₹159', image: '🥤', description: 'Dark thick liquid chocolate drink. 300 ML' },
       { name: 'Chocolate Thickshake', price: '₹169', image: '🥤', description: 'Classic creamy chocolate shake. 300 ML' },
       { name: 'Strawberry Shake', price: '₹179', image: '🥤', description: 'Refreshing & fruity shake. 300 ML' },
@@ -101,22 +101,22 @@ const FullMenu = () => {
       { name: 'Indian Panini', price: '₹129', image: '🥪', description: 'Desi spice panini.' },
       { name: 'Mexican Panini', price: '₹129', image: '🥪', description: 'Mexican sauce flavour.' },
       { name: 'Tandoori Panini', price: '₹139', image: '🥪', description: 'Tandoori grilled filling.' },
-      { name: 'Coslo Panini', price: '₹139', image: '🥪', description: 'Creamy cheesy mix.' }
+      { name: 'Coleslaw Panini', price: '₹139', image: '🥪', description: 'Creamy cheesy mix.' }
     ],
     sandwiches: [
       { name: 'Butter Sandwich', price: '₹59', image: '🥪', description: 'Soft buttery taste.' },
       { name: 'Butter Jam Sandwich', price: '₹69', image: '🥪', description: 'Sweet jam & butter.' },
       { name: 'Veg Sandwich', price: '₹69', image: '🥪', description: 'Fresh layered vegetables.' },
-      { name: 'Cheese Chutney', price: '₹79', image: '🥪', description: 'Cheese with tangy chutney.' },
-      { name: 'Veg Cheese', price: '₹89', image: '🥪', description: 'Veggies with melted cheese.' },
-      { name: 'Alloo Mutter', price: '₹89', image: '🥪', description: 'Spiced aloo mutter filling.' }
+      { name: 'Cheese Chutney Sandwich', price: '₹79', image: '🥪', description: 'Cheese with tangy chutney.' },
+      { name: 'Veg Cheese Sandwich', price: '₹89', image: '🥪', description: 'Veggies with melted cheese.' },
+      { name: 'Alloo Mutter Sandwich', price: '₹89', image: '🥪', description: 'Spiced aloo mutter filling.' }
     ],
     'double-sandwiches': [
-      { name: 'Mumbai Masala Chatpata', price: '₹119', image: '🥪', description: 'Tangy spiced veggies with a bold Mumbai flavour.' },
-      { name: 'Tandoori Paneer Tikka', price: '₹139', image: '🥪', description: 'Char-grilled paneer with rich tandoori notes.' },
-      { name: 'Cheese Corn', price: '₹149', image: '🥪', description: 'Sweet corn with melted cheese.' },
+      { name: 'Mumbai Masala Chatpata Sandwich', price: '₹119', image: '🥪', description: 'Tangy spiced veggies with a bold Mumbai flavour.' },
+      { name: 'Tandoori Paneer Tikka Sandwich', price: '₹139', image: '🥪', description: 'Char-grilled paneer with rich tandoori notes.' },
+      { name: 'Cheese Corn Sandwich', price: '₹149', image: '🥪', description: 'Sweet corn with melted cheese.' },
       { name: 'Peri Peri Paneer Sandwich', price: '₹169', image: '🥪', description: 'Spicy peri-peri paneer & veggies.' },
-      { name: 'Spinach & Corn', price: '₹179', image: '🥪', description: 'Creamy spinach with sweet corn.' },
+      { name: 'Spinach & Corn Sandwich', price: '₹179', image: '🥪', description: 'Creamy spinach with sweet corn.' },
       { name: 'Club Sandwich', price: '₹199', image: '🥪', description: 'Classic triple-layer delight.' },
       { name: 'Pineapple Sandwich (3layers)', price: '₹199', image: '🥪', description: 'Sweet tropical pineapple layers.' },
       { name: 'Chocolate Sandwich (3layers)', price: '₹209', image: '🥪', description: 'Rich triple chocolate spread.' },
@@ -141,16 +141,16 @@ const FullMenu = () => {
       { name: 'Cheese Corn Garlic Bread', price: '₹159', image: '🍞', description: 'Corn & cheese loaded.' }
     ],
     pizza: [
-      { name: 'Full Cheese Bliss', price: '₹219', image: '🍕', description: 'Loaded mozzarella.' },
-      { name: 'Garden Carnival', price: '₹249', image: '🍕', description: 'Fresh vegetable toppings.' },
+      { name: 'Full Cheese Bliss Pizza', price: '₹219', image: '🍕', description: 'Loaded mozzarella.' },
+      { name: 'Garden Carnival Pizza', price: '₹249', image: '🍕', description: 'Fresh vegetable toppings.' },
       { name: 'Spicy Firecracker Pizza', price: '₹259', image: '🍕', description: 'Bold spicy flavour.' },
-      { name: 'Paneer Tikka Delight', price: '₹269', image: '🍕', description: 'Tandoori paneer flavour.' },
+      { name: 'Paneer Tikka Delight Pizza', price: '₹269', image: '🍕', description: 'Tandoori paneer flavour.' },
       { name: 'Café Culture Signature Pizza', price: '₹299', image: '🍕', description: 'Nachos/olives/fries loaded.' }
     ],
     pasta: [
-      { name: 'Snowy Alferedo', price: '₹199', image: '🍝', description: 'Creamy white sauce.' },
-      { name: 'Crimson Heat', price: '₹199', image: '🍝', description: 'Red spicy pasta.' },
-      { name: 'Blush Romance', price: '₹249', image: '🍝', description: 'Pink fusion sauce.' }
+      { name: 'Snowy Alferedo Pasta', price: '₹199', image: '🍝', description: 'Creamy white sauce.' },
+      { name: 'Crimson Heat Pasta', price: '₹199', image: '🍝', description: 'Red spicy pasta.' },
+      { name: 'Blush Romance Pasta', price: '₹249', image: '🍝', description: 'Pink fusion sauce.' }
     ],
     maggie: [
       { name: 'Classic Maggie', price: '₹99', image: '🍜', description: 'Nostalgic flavours.' },
@@ -244,27 +244,27 @@ const FullMenu = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    const scroll = () => {
-      if (isPausedRef.current) return;
-      
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      if (maxScroll <= 0) return; // No need to scroll if content fits
-      
-      if (container.scrollLeft >= maxScroll - 1) {
-        // Reset to start when reaching the end
-        container.scrollLeft = 0;
-      } else {
-        // Slowly scroll to the left
-        container.scrollLeft += 0.5;
+    let frameId;
+
+    const step = () => {
+      if (!container) return;
+      if (!isPausedRef.current) {
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        if (maxScroll > 0) {
+          if (container.scrollLeft >= maxScroll - 1) {
+            container.scrollLeft = 0;
+          } else {
+            container.scrollLeft += 0.6; // slightly faster for mobile, smooth on all devices
+          }
+        }
       }
+      frameId = requestAnimationFrame(step);
     };
 
-    autoScrollRef.current = setInterval(scroll, 20); // Update every 20ms for smooth scroll
+    frameId = requestAnimationFrame(step);
 
     return () => {
-      if (autoScrollRef.current) {
-        clearInterval(autoScrollRef.current);
-      }
+      if (frameId) cancelAnimationFrame(frameId);
     };
   }, []);
 

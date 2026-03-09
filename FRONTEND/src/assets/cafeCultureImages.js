@@ -250,7 +250,7 @@ export const menuImageMapping = {
   'Cranberry Mojito': cranberryOrangeMojitoImage, // Using cranberry orange as closest match
   'Strawberry Mint Mojito': strawberryMintMojitoImage,
   'Watermelon Mojito': watermelonMojitoImage,
-  'Curacao Blue': curacaoBlueImage,
+  'Curacao Blue Mojito': curacaoBlueImage,
   'Red Bull Mojito': redBullMojitoImage,
   'Beer Mojito': beerMojitoImage,
   
@@ -259,7 +259,7 @@ export const menuImageMapping = {
   'Caramel Cheesecake Frappe': caramelCheesecakeFrappeImage,
   'Irish Cold Coffee': irishCoffeeImage, // Using irish coffee as closest match
   'Biscoff Frappe': biscoffColdFrappeImage,
-  'Mocha Java Chip': iceBelgianMochaJawaImage, // Using belgian mocha java as closest match
+  'Mocha Java Chip Frappe': iceBelgianMochaJawaImage, // Using belgian mocha java as closest match
   'Tiramisu Frappe': tiramisuFrappeImage,
   'Nutella Frappe': nutellaFrappeImage,
   'Brownie Frappe': brownieThickShakeImage, // Using brownie thick shake as closest match
@@ -277,7 +277,7 @@ export const menuImageMapping = {
   'Full Power Smoothie': healthySmoothieImage, // Using healthy smoothie as closest match
   
   // ========== THICK SHAKES ==========
-  'Classic Vanilla': classicVanillaImage,
+  'Classic Vanilla Shake': classicVanillaImage,
   'Cold Cocoa': coldCocoaImage,
   'Chocolate Thickshake': chocolateThickShakeImage,
   'Strawberry Shake': strawberryShakeImage,
@@ -291,22 +291,22 @@ export const menuImageMapping = {
   'Indian Panini': indianPaniniImage,
   'Mexican Panini': mexicanPaniniImage,
   'Tandoori Panini': tandooriPaniniImage,
-  'Coslo Panini': cosloPaniniImage,
+  'Coleslaw Panini': cosloPaniniImage,
   
   // ========== SANDWICHES ==========
   'Butter Sandwich': butterSandwichImage,
   'Butter Jam Sandwich': butterJamSandwichImage,
   'Veg Sandwich': vegSandwichImage,
-  'Cheese Chutney': cheeseChutneyImage,
-  'Veg Cheese': vegCheeseImage,
-  'Alloo Mutter': allooMutterImage,
+  'Cheese Chutney Sandwich': cheeseChutneyImage,
+  'Veg Cheese Sandwich': vegCheeseImage,
+  'Alloo Mutter Sandwich': allooMutterImage,
   
   // ========== DOUBLE SANDWICHES ==========
-  'Mumbai Masala Chatpata': mumbaiMasalaChatpataImage,
-  'Tandoori Paneer Tikka': tandooriPaneerTikkaImage,
-  'Cheese Corn': spinachCornImage, // Using spinach corn as closest match
+  'Mumbai Masala Chatpata Sandwich': mumbaiMasalaChatpataImage,
+  'Tandoori Paneer Tikka Sandwich': tandooriPaneerTikkaImage,
+  'Cheese Corn Sandwich': spinachCornImage, // Using spinach corn as closest match
   'Peri Peri Paneer Sandwich': periPeriPaneerSandwichImage,
-  'Spinach & Corn': spinachCornSandwichImage,
+  'Spinach & Corn Sandwich': spinachCornSandwichImage,
   'Club Sandwich': clubSandwichImage,
   'Pineapple Sandwich (3layers)': pineappleSandwichImage,
   'Chocolate Sandwich (3layers)': chocolateSandwichImage,
@@ -331,16 +331,16 @@ export const menuImageMapping = {
   'Cheese Corn Garlic Bread': cheeseCornGarlicBreadImage,
   
   // ========== PIZZA ==========
-  'Full Cheese Bliss': fullCheeseBlissImage,
-  'Garden Carnival': gardenCarnivalImage,
+  'Full Cheese Bliss Pizza': fullCheeseBlissImage,
+  'Garden Carnival Pizza': gardenCarnivalImage,
   'Spicy Firecracker Pizza': spicyFirecrackerImage,
-  'Paneer Tikka Delight': paneerTikkaDelightImage,
+  'Paneer Tikka Delight Pizza': paneerTikkaDelightImage,
   'Café Culture Signature Pizza': cafeCultureSignaturePizzaImage,
   
   // ========== PASTA ==========
-  'Snowy Alferedo': snowyAlfredoImage,
-  'Crimson Heat': crimsonHeatImage,
-  'Blush Romance': blushRomanceImage,
+  'Snowy Alferedo Pasta': snowyAlfredoImage,
+  'Crimson Heat Pasta': crimsonHeatImage,
+  'Blush Romance Pasta': blushRomanceImage,
   
   // ========== MAGGIE ==========
   'Classic Maggie': classicMaggieImage,

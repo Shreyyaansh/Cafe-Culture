@@ -19,7 +19,7 @@ This document lists all menu items that currently don't have corresponding image
 - `cafe special chai.jpg` - Café Special Chai
 
 ## Mojitos (3 items)
-- `curacao blue.jpg` - Curacao Blue
+~ `curacao blue.jpg` - Curacao Blue Mojito
 - `red bull mojito.jpg` - Red Bull Mojito
 - `beer mojito.jpg` - Beer Mojito
 
@@ -49,7 +49,7 @@ This document lists all menu items that currently don't have corresponding image
 - `indian panini.jpg` - Indian Panini
 - `mexican panini.jpg` - Mexican Panini
 - `tandoori panini.jpg` - Tandoori Panini
-- `coslo panini.jpg` - Coslo Panini
+~ `coslo panini.jpg` - Coleslaw Panini
 
 ## Sandwiches (6 items)
 - `butter sandwich.jpg` - Butter Sandwich
