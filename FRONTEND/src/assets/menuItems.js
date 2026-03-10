@@ -229,6 +229,31 @@ Object.keys(menuItemsFromFullMenu).forEach(category => {
   });
 });
 
+// Special grill variants for sandwiches: +₹30 and "(Grill)" label
+const grillSandwichNames = [
+  'Butter Sandwich',
+  'Butter Jam Sandwich',
+  'Veg Sandwich',
+  'Cheese Chutney Sandwich',
+  'Veg Cheese Sandwich',
+  'Alloo Mutter Sandwich'
+];
+
+grillSandwichNames.forEach((name) => {
+  const baseId = generateId(name);
+  const baseItem = menuItemsData[baseId];
+  if (baseItem) {
+    const grillId = `${baseId}-grill`;
+    menuItemsData[grillId] = {
+      ...baseItem,
+      id: grillId,
+      name: `${baseItem.name} (Grill)`,
+      price: baseItem.price + 30,
+      extra: 'Grill added (+₹30)'
+    };
+  }
+});
+
 // Helper function to get menu item by ID
 export const getMenuItemById = (id) => {
   return menuItemsData[id] || null;

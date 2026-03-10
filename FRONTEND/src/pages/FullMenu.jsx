@@ -2,6 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getMenuImage, menuImageMapping } from '../assets/cafeCultureImages';
 import { UseAppContext } from '../context/AppContext';
 
+const grillSandwichNames = new Set([
+  'Butter Sandwich',
+  'Butter Jam Sandwich',
+  'Veg Sandwich',
+  'Cheese Chutney Sandwich',
+  'Veg Cheese Sandwich',
+  'Alloo Mutter Sandwich'
+]);
+
 const FullMenu = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -9,6 +18,7 @@ const FullMenu = () => {
   const scrollContainerRef = useRef(null);
   const isPausedRef = useRef(false);
   const isAutoScrollStoppedRef = useRef(false);
+  const [pendingGrillItem, setPendingGrillItem] = useState(null);
 
   const menuItems = {
     'hot-coffees': [
@@ -104,12 +114,12 @@ const FullMenu = () => {
       { name: 'Coleslaw Panini', price: '₹139', image: '🥪', description: 'Creamy cheesy mix.' }
     ],
     sandwiches: [
-      { name: 'Butter Sandwich', price: '₹59', image: '🥪', description: 'Soft buttery taste.' },
-      { name: 'Butter Jam Sandwich', price: '₹69', image: '🥪', description: 'Sweet jam & butter.' },
-      { name: 'Veg Sandwich', price: '₹69', image: '🥪', description: 'Fresh layered vegetables.' },
-      { name: 'Cheese Chutney Sandwich', price: '₹79', image: '🥪', description: 'Cheese with tangy chutney.' },
-      { name: 'Veg Cheese Sandwich', price: '₹89', image: '🥪', description: 'Veggies with melted cheese.' },
-      { name: 'Alloo Mutter Sandwich', price: '₹89', image: '🥪', description: 'Spiced aloo mutter filling.' }
+      { name: 'Butter Sandwich', price: '₹59', image: '🥪', description: 'Soft buttery taste.\nAdd Grill for extra ₹30.' },
+      { name: 'Butter Jam Sandwich', price: '₹69', image: '🥪', description: 'Sweet jam & butter.\nAdd Grill for extra ₹30.' },
+      { name: 'Veg Sandwich', price: '₹69', image: '🥪', description: 'Fresh layered vegetables.\nAdd Grill for extra ₹30.' },
+      { name: 'Cheese Chutney Sandwich', price: '₹79', image: '🥪', description: 'Cheese with tangy chutney.\nAdd Grill for extra ₹30.' },
+      { name: 'Veg Cheese Sandwich', price: '₹89', image: '🥪', description: 'Veggies with melted cheese.\nAdd Grill for extra ₹30.' },
+      { name: 'Alloo Mutter Sandwich', price: '₹89', image: '🥪', description: 'Spiced aloo mutter filling.\nAdd Grill for extra ₹30.' }
     ],
     'double-sandwiches': [
       { name: 'Mumbai Masala Chatpata Sandwich', price: '₹119', image: '🥪', description: 'Tangy spiced veggies with a bold Mumbai flavour.' },
@@ -192,7 +202,7 @@ const FullMenu = () => {
       { name: 'Butter Croissant', price: '₹99', image: '🥐', description: 'Light, buttery, perfectly crisp.' },
       { name: 'Nutella Croissant', price: '₹159', image: '🥐', description: 'Flaky layers filled with Nutella.' },
       { name: 'Black Forest Breeze', price: '₹179', image: '🍰', description: 'Chocolate with whipped cherry lightness.' },
-      { name: 'Brownie', price: '₹179', image: '🍰', description: 'Dense, fudgy, chocolate-rich.' },
+      { name: 'Sizzling Brownie', price: '₹179', image: '🍰', description: 'Dense, fudgy, chocolate-rich.' },
       { name: 'Chocolate Chips', price: '₹199', image: '🍰', description: 'Soft, velvety & mildly cocoa-sweet.' },
       { name: 'New York Cheesecake', price: '₹209', image: '🍰', description: 'Classic, creamy & rich.' },
       { name: 'Nutella Cheesecake', price: '₹219', image: '🍰', description: 'Silky cheesecake with Nutella swirl.' },
@@ -251,7 +261,7 @@ const FullMenu = () => {
           if (container.scrollLeft >= maxScroll - 1) {
             container.scrollLeft = 0;
           } else {
-            container.scrollLeft += 1.2; // faster so movement is clearly visible on mobile/iOS
+            container.scrollLeft += 1.0; // faster so movement is clearly visible on mobile/iOS
           }
         }
       }
@@ -290,6 +300,7 @@ const FullMenu = () => {
   const MenuItemCard = ({ item }) => {
     const itemId = item.id || item.name.toLowerCase().replace(/\s+/g, '-');
     const quantityInCart = cartItems[itemId] || 0;
+    const requiresGrillPrompt = grillSandwichNames.has(item.name);
     
     console.log('🍽️ MenuItemCard - item:', item);
     console.log('🍽️ MenuItemCard - itemId:', itemId);
@@ -337,8 +348,14 @@ const FullMenu = () => {
                     <span className='text-[#7c3f00] font-semibold min-w-[20px] text-center'>{quantityInCart}</span>
                     <button
                       onClick={() => {
-                        console.log('➕ Add button clicked for itemId:', itemId);
-                        addToCart(itemId);
+                        if (requiresGrillPrompt) {
+                          setPendingGrillItem({
+                            baseId: itemId,
+                            name: item.name
+                          });
+                        } else {
+                          addToCart(itemId);
+                        }
                       }}
                       className='w-6 h-6 rounded-full bg-[#7c3f00] text-white flex items-center justify-center text-sm hover:bg-[#a0522d] transition-colors'
                     >
@@ -348,8 +365,14 @@ const FullMenu = () => {
                 ) : (
                   <button
                     onClick={() => {
-                      console.log('➕ Add button clicked for itemId:', itemId);
-                      addToCart(itemId);
+                      if (requiresGrillPrompt) {
+                        setPendingGrillItem({
+                          baseId: itemId,
+                          name: item.name
+                        });
+                      } else {
+                        addToCart(itemId);
+                      }
                     }}
                     className='px-4 py-2 bg-[#7c3f00] text-white rounded-lg font-semibold hover:bg-[#a0522d] transition-colors text-sm'
                   >
@@ -527,6 +550,43 @@ const FullMenu = () => {
                 Clear Search
               </button>
             )}
+          </div>
+        )}
+
+        {/* Grill selection modal for sandwiches */}
+        {pendingGrillItem && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4'>
+            <div className='bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6'>
+              <h3 className='text-xl font-bold text-[#7c3f00] mb-3'>
+                Add grill for {pendingGrillItem.name}?
+              </h3>
+              <p className='text-sm text-[#7c3f00]/80 mb-6 leading-relaxed'>
+                You can add grill to this sandwich for an extra <span className='font-semibold'>₹30</span>.
+              </p>
+              <div className='flex gap-3 justify-end'>
+                <button
+                  onClick={() => {
+                    // No grill: add base item
+                    addToCart(pendingGrillItem.baseId);
+                    setPendingGrillItem(null);
+                  }}
+                  className='px-4 py-2 rounded-lg border border-[#7c3f00]/30 text-[#7c3f00] font-semibold hover:bg-[#faf0e6] transition-colors text-sm'
+                >
+                  No, normal
+                </button>
+                <button
+                  onClick={() => {
+                    // With grill: use special grill ID that has +₹30 price
+                    const grillId = `${pendingGrillItem.baseId}-grill`;
+                    addToCart(grillId);
+                    setPendingGrillItem(null);
+                  }}
+                  className='px-4 py-2 rounded-lg bg-[#7c3f00] text-white font-semibold hover:bg-[#a0522d] transition-colors text-sm'
+                >
+                  Yes, add grill +₹30
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

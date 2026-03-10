@@ -300,6 +300,13 @@ export const menuImageMapping = {
   'Cheese Chutney Sandwich': cheeseChutneyImage,
   'Veg Cheese Sandwich': vegCheeseImage,
   'Alloo Mutter Sandwich': allooMutterImage,
+  // Grill variants reuse same images
+  'Butter Sandwich (Grill)': butterSandwichImage,
+  'Butter Jam Sandwich (Grill)': butterJamSandwichImage,
+  'Veg Sandwich (Grill)': vegSandwichImage,
+  'Cheese Chutney Sandwich (Grill)': cheeseChutneyImage,
+  'Veg Cheese Sandwich (Grill)': vegCheeseImage,
+  'Alloo Mutter Sandwich (Grill)': allooMutterImage,
   
   // ========== DOUBLE SANDWICHES ==========
   'Mumbai Masala Chatpata Sandwich': mumbaiMasalaChatpataImage,
@@ -382,7 +389,7 @@ export const menuImageMapping = {
   'Butter Croissant': butterImage,
   'Nutella Croissant': nutellaCroissantImage,
   'Black Forest Breeze': blackForestBreezeImage,
-  'Brownie': chocolateWalnutBrownieImage, // Using chocolate walnut brownie as closest match
+  'Sizzling Brownie': chocolateWalnutBrownieImage, // Using chocolate walnut brownie as closest match
   'Chocolate Chips': chocolateChipsImage,
   'New York Cheesecake': newYorkCheesecakeImage,
   'Nutella Cheesecake': nutellaCheeseCakeImage,
