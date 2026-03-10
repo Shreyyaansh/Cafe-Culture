@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { UseAppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
 import { getMenuItemById, isMenuItem } from '../assets/menuItems';
-import { menuImageMapping } from '../assets/cafeCultureImages';
+import { getMenuImage } from '../assets/cafeCultureImages';
 import toast from 'react-hot-toast';
 
 
@@ -13,9 +13,8 @@ const Cart = () => {
     // Helper function to get the correct image for cart items
     const getItemImage = (item) => {
         if (item.isMenuItem) {
-            // For menu items, use the image mapping
-            const imageKey = item.name;
-            return menuImageMapping[imageKey] || '🍽️';
+            // For menu items (including grill variants), always go through getMenuImage
+            return getMenuImage(item.name);
         } else {
             // For database products, use the original image
             return item.images[0] || '🍽️';
