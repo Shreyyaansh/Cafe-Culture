@@ -212,7 +212,13 @@ const Cart = () => {
                                     <div className="w-16 h-16 flex items-center justify-center border border-[#7c3f00]/20 rounded-lg bg-[#faf0e6] flex-shrink-0">
                                         {(() => {
                                             const image = getItemImage(product);
-                                            return typeof image === 'string' && image.startsWith('/') ? (
+                                            const isUrl = typeof image === 'string' && (
+                                                image.startsWith('/') ||
+                                                image.startsWith('http://') ||
+                                                image.startsWith('https://') ||
+                                                image.startsWith('data:')
+                                            );
+                                            return isUrl ? (
                                                 <img 
                                                     className="max-w-full h-full object-cover rounded-lg" 
                                                     src={image} 
@@ -263,7 +269,13 @@ const Cart = () => {
                                     <div className="cursor-pointer w-20 h-20 flex items-center justify-center border border-[#7c3f00]/20 rounded-lg bg-[#faf0e6]">
                                         {(() => {
                                             const image = getItemImage(product);
-                                            return typeof image === 'string' && image.startsWith('/') ? (
+                                            const isUrl = typeof image === 'string' && (
+                                                image.startsWith('/') ||
+                                                image.startsWith('http://') ||
+                                                image.startsWith('https://') ||
+                                                image.startsWith('data:')
+                                            );
+                                            return isUrl ? (
                                                 <img 
                                                     className="max-w-full h-full object-cover rounded-lg" 
                                                     src={image} 
